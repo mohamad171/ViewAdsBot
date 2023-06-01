@@ -1,16 +1,21 @@
 from pyrogram import Client, filters
 import asyncio
-
 from pyrogram import Client
+from pyrogram.raw.functions import auth
+api_id = 26261816
+api_hash = "a507aa6622033ed9015594c949795ce9"
 
-async def run() :
-    api_id = 26261816
-    api_hash = "a507aa6622033ed9015594c949795ce9"
-    async with Client("17845265572", api_id, api_hash) as app:
-        print(await app.export_session_string())
-        # print(await app.send_code())
 
-asyncio.run(run())
+def send_code(phone):
+    with Client(phone, api_id, api_hash) as app:
+        sent_code = app.send_code(phone)
+        return sent_code
+
+
+def signin(phone,code,sent_code):
+    with Client(phone, api_id, api_hash) as app:
+        result = auth.sign_in.SignIn(phone_number=phone,phone_code=code,phone_code_hash=sent_code.phone_code_hash)
+        return result
 
 # phone = "+99**********8"
 # name = "ali"

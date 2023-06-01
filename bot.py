@@ -8,7 +8,7 @@ import string
 from utils import keyboards
 import BackendInterface
 from utils.keyboards import *
-
+from ClientApiInterface import *
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -17,6 +17,7 @@ add_phone_data = {}
 
 logger = logging.getLogger(__name__)
 backend_interface = BackendInterface.BackendInterface()
+
 
 SET_PHONE_NUMBER, SET_CODE = range(2)
 
@@ -47,7 +48,8 @@ async def add_account_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     phone = update.message.text
     add_phone_data[update.message.chat_id]["phone"] = phone
-    # TODO Send sms code
+    r = send_code(phone)
+    add_phone_data[update.message.chat_id]["sent_code"] = r
     await update.message.reply_text(f"کد تایید به شماره {phone} پیامک شد")
     await update.message.reply_text("کد تایید را وارد کنید")
     return SET_CODE
@@ -56,7 +58,10 @@ async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     code = update.message.text
     await update.message.reply_text(f"ok code is {code}")
-    # TODO Check code
+    sent_code = add_phone_data[update.message.chat_id]["sent_code"]
+    phone = add_phone_data[update.message.chat_id]["phone"]
+    r = signin(phone,code,sent_code)
+    print(r)
     user = backend_interface.get_user(update.message.chat_id)
     if user:
         status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"])

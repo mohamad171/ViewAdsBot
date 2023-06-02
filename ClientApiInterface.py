@@ -2,20 +2,67 @@ from pyrogram import Client, filters
 import asyncio
 from pyrogram import Client
 from pyrogram.raw.functions import auth
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired
+
 api_id = 26261816
 api_hash = "a507aa6622033ed9015594c949795ce9"
 
 
-def send_code(phone):
-    with Client(phone, api_id, api_hash) as app:
-        sent_code = app.send_code(phone)
-        return sent_code
+async def send_code(phone):
+    client = Client(phone, api_id, api_hash)
+    await client.connect()
+    try:
+        sent_code = await client.send_code(phone)
+        # client.disconnect()
+        return sent_code,client
+    except:
+        return None,None
 
 
-def signin(phone,code,sent_code):
-    with Client(phone, api_id, api_hash) as app:
-        result = auth.sign_in.SignIn(phone_number=phone,phone_code=code,phone_code_hash=sent_code.phone_code_hash)
-        return result
+async def signin(client,phone,code,sent_code):
+    # client = Client(phone, api_id, api_hash)
+    # await client.connect()
+    try:
+        await client.sign_in(phone_number= phone,phone_code_hash=sent_code.phone_code_hash,phone_code=code)
+        hash = await client.export_session_string()
+        await client.disconnect()
+        return hash
+    except SessionPasswordNeeded:
+        await client.disconnect()
+        return "password"
+
+    except PhoneCodeInvalid:
+        await client.disconnect()
+        return "invalid"
+
+    except PhoneCodeExpired:
+        await client.disconnect()
+        return "invalid"
+
+    # await client.connect()
+    # try:
+    #     result = await auth.sign_in.SignIn(phone_number=phone,phone_code=code,phone_code_hash=sent_code.phone_code_hash)
+    #     client.disconnect()
+    #     return result
+    # except:
+    #     return None
+
+
+
+async def change_bio_image(phone,hash,bio_text,profile_image):
+    client = Client(phone, api_id, api_hash,session_string=hash)
+    await client.connect()
+    try:
+        await client.update_profile(bio=bio_text)
+        await client.set_profile_photo(profile_image)
+        await client.disconnect()
+        return True
+        
+    except:
+        await client.disconnect()
+        return False
+
+
 
 # phone = "+99**********8"
 # name = "ali"

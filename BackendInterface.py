@@ -22,12 +22,22 @@ class BackendInterface:
             return s_u
         return None
 
-    def add_account(self,user,phone):
+    def add_account(self,user,phone,hash):
         if not Account.objects.filter(phone=phone).exists():
             account = Account()
             account.user = user
             account.phone = phone
+            account.session_string = hash
+            account.is_active = True
+            account.is_logged_in = True
             account.save()
             return True,"اکانت با موفقیت اضافه شد"
         return False,"اکانت قبلا اضافه شده"
 
+    def get_random_bio(self):
+        bio = SampleBio.objects.filter().order_by("?")
+        return bio.first()
+    
+    def get_random_image(self):
+        profile_photo = SampleProfileImage.objects.filter().order_by("?")
+        return profile_photo.first().image_profile.path

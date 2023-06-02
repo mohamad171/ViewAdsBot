@@ -8,7 +8,9 @@ import string
 from utils import keyboards
 import BackendInterface
 from utils.keyboards import *
-from ClientApiInterface import *
+from utils.regexes import *
+from ClientApiInterface import send_code , signin
+import re
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -47,12 +49,19 @@ async def add_account_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     phone = update.message.text
-    add_phone_data[update.message.chat_id]["phone"] = phone
-    r = send_code(phone)
-    add_phone_data[update.message.chat_id]["sent_code"] = r
-    await update.message.reply_text(f"کد تایید به شماره {phone} پیامک شد")
-    await update.message.reply_text("کد تایید را وارد کنید")
-    return SET_CODE
+    if re.match(phone_regex,phone):
+        add_phone_data[update.message.chat_id]["phone"] = phone
+        r,client = await send_code(phone)
+        if r:
+            add_phone_data[update.message.chat_id]["sent_code"] = r
+            add_phone_data[update.message.chat_id]["client"] = client
+            await update.message.reply_text(f"کد تایید برای شماره {phone} ارسال شد")
+            await update.message.reply_text("کد تایید را وارد کنید")
+            return SET_CODE
+        
+    await update.message.reply_text("شماره موبایل را صحیح وارد کنید نمونه: +17845333959")
+    return SET_PHONE_NUMBER
+
 
 
 async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -60,11 +69,22 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f"ok code is {code}")
     sent_code = add_phone_data[update.message.chat_id]["sent_code"]
     phone = add_phone_data[update.message.chat_id]["phone"]
-    r = signin(phone,code,sent_code)
-    print(r)
+    client = add_phone_data[update.message.chat_id]["client"]
+    r = await signin(client,phone,code,sent_code)
+    if r == "password":
+        await update.message.reply_text("ورود دو مرحله ای")
+        return ConversationHandler.END
+    elif r == "invalid":
+        await update.message.reply_text("کد وارد شده صحیح نیست دوباره کد را وارد کنید")
+        return SET_CODE
+    
+    
     user = backend_interface.get_user(update.message.chat_id)
     if user:
-        status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"])
+        status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"],r)
+        if status:
+            add_phone_data[update.message.chat_id] = {}
+
         await update.message.reply_text(f"{result}")
 
     else:

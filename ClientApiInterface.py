@@ -1,8 +1,8 @@
 from pyrogram import Client, filters
 import asyncio
 from pyrogram import Client
-from pyrogram.raw.functions import auth
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired
+from pyrogram.raw.functions import auth,account
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired , AuthKeyUnregistered
 
 api_id = 26261816
 api_hash = "a507aa6622033ed9015594c949795ce9"
@@ -49,6 +49,29 @@ async def client_set_password(client,password):
 
     except PasswordHashInvalid:
         return "invalid"
+
+
+async def check_session(phone):
+    client = Client(phone.replace("+",""),api_id=api_id, api_hash=api_hash,workdir="media/sessions")
+    await client.connect()
+    any_account_is_logged_in = False
+    try:
+        result = await client.invoke(account.GetAuthorizations())
+        for authoriz in result.authorizations:
+            if authoriz.current != True:
+                any_account_is_logged_in = True
+        if not any_account_is_logged_in:
+            return True
+        else:
+            return False
+
+
+    except AuthKeyUnregistered:
+        pass
+    return False
+
+
+
 
 
 

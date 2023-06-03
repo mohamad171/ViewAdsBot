@@ -9,7 +9,7 @@ from utils import keyboards
 import BackendInterface
 from utils.keyboards import *
 from utils.regexes import *
-from ClientApiInterface import send_code , signin, client_set_password
+from ClientApiInterface import send_code , signin, client_set_password,check_session
 import re
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -33,6 +33,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     backend_interface.register(update.message.chat_id, first_name, username)
     await update.message.reply_text("برای ادامه یکی از گزینه های زیر را انتخاب کنید",reply_markup=main_menu_keyboard())
 
+async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("برای ادامه دکمه تایید را بزنید",reply_markup=check_clear_session_keyboard())
+
 
 async def add_account_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -50,6 +53,7 @@ async def add_account_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     phone = update.message.text
     if re.match(phone_regex,phone):
+        add_phone_data[update.message.chat_id] = {}
         add_phone_data[update.message.chat_id]["phone"] = phone
         r,client = await send_code(phone)
         if r:
@@ -73,11 +77,11 @@ async def set_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     user = backend_interface.get_user(update.message.chat_id)
     if user:
-        status, result = backend_interface.add_account(user, add_phone_data[update.message.chat_id]["phone"], r)
+        status, result = backend_interface.add_account(user, add_phone_data[update.message.chat_id]["phone"],r)
         if status:
-            add_phone_data[update.message.chat_id] = {}
-
-        await update.message.reply_text(f"{result}")
+            await update.message.reply_text(f"{result}",reply_markup=check_clear_session_keyboard())
+        else:
+            await update.message.reply_text(f"{result}", reply_markup=main_menu_keyboard())
 
     else:
         await update.message.reply_text("کاربر یافت نشد",reply_markup=main_menu_keyboard())
@@ -101,9 +105,10 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if user:
         status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"],r)
         if status:
-            add_phone_data[update.message.chat_id] = {}
+            await update.message.reply_text(f"{result}",reply_markup=check_clear_session_keyboard())
+        else:
+            await update.message.reply_text(f"{result}", reply_markup=main_menu_keyboard())
 
-        await update.message.reply_text(f"{result}")
         return ConversationHandler.END
 
     else:
@@ -115,6 +120,26 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("برای ادامه یکی از گزینه های زیر را انتخاب کنید",
                                         reply_markup=main_menu_keyboard())
     return ConversationHandler.END
+
+async def accept_logout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    user = backend_interface.get_user(query.message.chat_id)
+    phone = "+989106664920"
+    # phone = add_phone_data[update.message.chat_id]["phone"]
+    account = user.accounts.filter(phone=phone).first()
+    result = await check_session(account.phone)
+    if result:
+        r = backend_interface.activate_account(user,phone)
+        if r:
+            await query.message.reply_text("اکانت با موفقیت تایید شد و اعتبار به موجودی شما اضافه شد",reply_markup=main_menu_keyboard())
+        else:
+            await query.message.reply_text("این اکانت قبلا تایید شده است",
+                                           reply_markup=main_menu_keyboard())
+
+    else:
+        await query.message.reply_text("عملیات انجام نشد. لطفا بعد از پاک کردن تمامی نشست های فعال خود روی دکمه تایید کلیک کنید(نشست فعال ربات را حذف نکنید)",reply_markup=check_clear_session_keyboard())
+
+
 
 def main() -> None:
 
@@ -139,6 +164,8 @@ def main() -> None:
     )
     # application.add_handler(MessageHandler(filters.Regex("\/start [a-z0-9]{8}"), join_to_room))
     application.add_handler(MessageHandler(filters.Regex("\/start"), start))
+    application.add_handler(MessageHandler(filters.Regex("\/debug"), debug))
+    application.add_handler(CallbackQueryHandler(accept_logout,"accept_logout"))
     application.add_handler(add_account_conv_handler)
 
     application.run_polling()

@@ -14,7 +14,7 @@ class StartedUser(models.Model):
 
 
 class Account(models.Model):
-    user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True)
+    user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,related_name="accounts")
     phone = models.CharField(max_length=15)
     session_string = models.TextField(null=True)
     is_logged_in = models.BooleanField(default=False)

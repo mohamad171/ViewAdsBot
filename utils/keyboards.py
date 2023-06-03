@@ -22,3 +22,12 @@ def add_account_keyboard():
 
     ]
     return ReplyKeyboardMarkup(keyboard)
+
+def check_clear_session_keyboard():
+    keyboard = [
+        [
+            InlineKeyboardButton('تایید خروج از اکانت',callback_data='accept_logout'),
+        ],
+
+    ]
+    return InlineKeyboardMarkup(keyboard)

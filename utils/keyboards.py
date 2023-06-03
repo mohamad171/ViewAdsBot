@@ -1,5 +1,24 @@
-from telegram import ForceReply, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ForceReply, Update, InlineKeyboardButton, InlineKeyboardMarkup,KeyboardButton,ReplyKeyboardMarkup
 
 def main_menu_keyboard():
-    keyboard = [[InlineKeyboardButton('افزودن اکانت', callback_data='add_account')], ]
-    return InlineKeyboardMarkup(keyboard)
+    keyboard = [
+        [
+            KeyboardButton('افزودن اکانت'),
+            KeyboardButton('مشاهده لیست اکانت ها')
+
+        ],
+        [
+            KeyboardButton('مشاهده موجودی'),
+            KeyboardButton('پشتیبانی')
+        ]
+    ]
+    return ReplyKeyboardMarkup(keyboard)
+
+def add_account_keyboard():
+    keyboard = [
+        [
+            KeyboardButton('لغو'),
+        ],
+
+    ]
+    return ReplyKeyboardMarkup(keyboard)

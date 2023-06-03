@@ -39,13 +39,17 @@ async def signin(client,phone,code,sent_code):
         await client.disconnect()
         return "invalid"
 
-    # await client.connect()
-    # try:
-    #     result = await auth.sign_in.SignIn(phone_number=phone,phone_code=code,phone_code_hash=sent_code.phone_code_hash)
-    #     client.disconnect()
-    #     return result
-    # except:
-    #     return None
+
+async def client_set_password(client,password):
+    try:
+        client.check_password(password)
+        hash = await client.export_session_string()
+        await client.disconnect()
+        return hash
+
+    except PasswordHashInvalid:
+        return "invalid"
+
 
 
 

@@ -50,7 +50,7 @@ class BackendInterface:
         account_count = Account.objects.filter(user=user,is_active=True,is_checkout=False).count()
         return account_count
 
-    def add_checkout_request(self,user,card_number,account_count):
+    def add_checkout_request(self,user,card_number,account_count,set_checkouted=False):
         count = Account.objects.filter(user=user,is_active=True,is_checkout=False).count()
         
         if count >= int(account_count):
@@ -59,6 +59,15 @@ class BackendInterface:
             ch.account_count = account_count
             ch.card_number = card_number
             ch.save()
+
+            if set_checkouted:
+                for a in range(0,count):
+                    account = Account.objects.filter(user=user,is_active=True,is_checkout=False).first()
+                    account.is_checkout = True
+                    account.save()
+
+
+
             return True
         return False
 

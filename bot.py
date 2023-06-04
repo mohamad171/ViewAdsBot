@@ -182,7 +182,7 @@ async def set_account_count(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             add_checkout_data[update.message.chat_id]["account_count"] = update.message.text
             count = add_checkout_data[update.message.chat_id]["account_count"]
             card_number = add_checkout_data[update.message.chat_id]["card_number"]
-            result = backend_interface.add_checkout_request(user,card_number,count)
+            result = backend_interface.add_checkout_request(user,card_number,count,set_checkouted=True)
             if result:
                 await send_payment_message(f"درخواست جدید برای تسویه حساب {count} اکانت توسط {user.chat_id} با شماره کارت {card_number} ثبت شد",context=context)
                 await update.message.reply_text("درخواست شما با موفقیت ثبت شد ✅",reply_markup=main_menu_keyboard())

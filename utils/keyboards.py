@@ -14,7 +14,7 @@ def main_menu_keyboard():
     ]
     return ReplyKeyboardMarkup(keyboard,resize_keyboard=True)
 
-def add_account_keyboard():
+def cancele_keyboard():
     keyboard = [
         [
             KeyboardButton('لغو'),

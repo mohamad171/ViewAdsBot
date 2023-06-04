@@ -44,7 +44,7 @@ async def add_account_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     user = backend_interface.get_user(query.message.chat_id)
     if user:
         add_phone_data[query.message.chat_id] = {}
-        await query.message.reply_text("لطفا اکانت مورد نظر خود را همراه با پیش شماره وارد کنید : مثال : +19901102345",reply_markup=add_account_keyboard())
+        await query.message.reply_text("لطفا اکانت مورد نظر خود را همراه با پیش شماره وارد کنید : مثال : +19901102345",reply_markup=cancele_keyboard())
         return SET_PHONE_NUMBER
 
     await query.message.reply_text("کاربر یافت نشد",reply_markup=main_menu_keyboard())
@@ -60,11 +60,11 @@ async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         if r:
             add_phone_data[update.message.chat_id]["sent_code"] = r
             add_phone_data[update.message.chat_id]["client"] = client
-            await update.message.reply_text(f"کد برای شماره {phone} ارسال شد",reply_markup=add_account_keyboard())
-            await update.message.reply_text("کد ارسال شده را وارد کنید",reply_markup=add_account_keyboard())
+            await update.message.reply_text(f"کد برای شماره {phone} ارسال شد",reply_markup=cancele_keyboard())
+            await update.message.reply_text("کد ارسال شده را وارد کنید",reply_markup=cancele_keyboard())
             return SET_CODE
         
-    await update.message.reply_text("شماره موبایل را صحیح وارد کنید نمونه: +19901102345",reply_markup=add_account_keyboard())
+    await update.message.reply_text("شماره موبایل را صحیح وارد کنید نمونه: +19901102345",reply_markup=cancele_keyboard())
     return SET_PHONE_NUMBER
 
 
@@ -73,7 +73,7 @@ async def set_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     client = add_phone_data[update.message.chat_id]["client"]
     r = await client_set_password(client,password)
     if r == "invalid":
-        await update.message.reply_text("رمز عبور صحیح نیست لطفا مجددا تلاش کنید",reply_markup=add_account_keyboard())
+        await update.message.reply_text("رمز عبور صحیح نیست لطفا مجددا تلاش کنید",reply_markup=cancele_keyboard())
         return SET_PASSWORD
 
     user = backend_interface.get_user(update.message.chat_id)
@@ -95,10 +95,10 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     client = add_phone_data[update.message.chat_id]["client"]
     r = await signin(client,phone,code,sent_code)
     if r == "password":
-        await update.message.reply_text("ورود دو مرحله ای نیاز است\nلطفا رمز عبور را وارد کنید",reply_markup=add_account_keyboard())
+        await update.message.reply_text("ورود دو مرحله ای نیاز است\nلطفا رمز عبور را وارد کنید",reply_markup=cancele_keyboard())
         return SET_PASSWORD
     elif r == "invalid":
-        await update.message.reply_text("کد وارد شده صحیح نیست دوباره کد را وارد کنید",reply_markup=add_account_keyboard())
+        await update.message.reply_text("کد وارد شده صحیح نیست دوباره کد را وارد کنید",reply_markup=cancele_keyboard())
         return SET_CODE
     
 
@@ -113,7 +113,7 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return ConversationHandler.END
 
     else:
-        await update.message.reply_text("کاربر یافت نشد",reply_markup=add_account_keyboard())
+        await update.message.reply_text("کاربر یافت نشد",reply_markup=cancele_keyboard())
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -150,7 +150,7 @@ async def user_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("شماره کارت خود را ارسال کنید ✅")
+    await update.message.reply_text("شماره کارت خود را ارسال کنید ✅",reply_markup=cancele_keyboard())
     add_checkout_data[update.message.chat_id] = {}
     return SET_CARD_NUMBER
 
@@ -158,7 +158,7 @@ async def set_card_number(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     add_checkout_data[update.message.chat_id]["card_number"] = update.message.text
     user = backend_interface.get_user(update.message.chat_id)
     checkout_account_count = backend_interface.get_checkout_account_count(user)
-    await update.message.reply_text(f"تعداد اکانت برای تسویه را وارد کنید ✅ \n تعداد اکانت قابل تسویه: {checkout_account_count}")
+    await update.message.reply_text(f"تعداد اکانت برای تسویه را وارد کنید ✅ \n تعداد اکانت قابل تسویه: {checkout_account_count}",reply_markup=cancele_keyboard())
     return SET_ACCOUNT_COUNT 
 
 async def set_account_count(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -171,15 +171,15 @@ async def set_account_count(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             card_number = add_checkout_data[update.message.chat_id]["card_number"]
             result = backend_interface.add_checkout_request(user,card_number,count)
             if result:
-                await update.message.reply_text("درخواست شما با موفقیت ثبت شد ✅")
+                await update.message.reply_text("درخواست شما با موفقیت ثبت شد ✅",reply_markup=main_menu_keyboard())
             else:
-                await update.message.reply_text("خطایی رخ داده با پشتیبانی تماس بگیرید")
+                await update.message.reply_text("خطایی رخ داده با پشتیبانی تماس بگیرید",reply_markup=cancele_keyboard())
 
             return ConversationHandler.END
 
             
         else:
-            await update.message.reply_text("عدد وارد شده بیشتر از تعداد اکانت قابل تسویه است")
+            await update.message.reply_text("عدد وارد شده بیشتر از تعداد اکانت قابل تسویه است",reply_markup=cancele_keyboard())
             return SET_ACCOUNT_COUNT
     except:
         pass

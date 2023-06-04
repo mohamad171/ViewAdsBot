@@ -13,12 +13,33 @@ class StartedUser(models.Model):
         return self.full_name
 
 
+class CliInfo(models.Model):
+    api_key = models.CharField(max_length=32)
+    api_hash = models.CharField(max_length=64)
+    max_account = models.IntegerField()
+
+    def __str__(self):
+        return self.api_key
+
+class ProxyInfo(models.Model):
+    username = models.CharField(max_length=32)
+    password = models.CharField(max_length=64)
+    ip = models.CharField(max_length=20)
+    port = models.IntegerField()
+    max_account = models.IntegerField()
+
+    def __str__(self):
+        return self.ip
+
 class Account(models.Model):
     user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,related_name="accounts")
+    cli_info = models.ForeignKey(CliInfo,on_delete=models.SET_NULL,null=True,related_name="cli_accounts")
+    proxy_info = models.ForeignKey(ProxyInfo,on_delete=models.SET_NULL,null=True,related_name="proxy_accounts")
     phone = models.CharField(max_length=15)
     session_string = models.TextField(null=True)
     is_logged_in = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_checkout = models.BooleanField(default=False)
     bio = models.TextField(null=True,blank=True)
     image_profile = models.ImageField(upload_to="account/profiles",null=True)
     session_file = models.FileField(upload_to="sessions",null=True)
@@ -26,6 +47,14 @@ class Account(models.Model):
     def __str__(self):
         return self.phone
 
+class Checkout(models.Model):
+    user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,related_name="checkouts")
+    account_count = models.IntegerField()
+    card_number = models.CharField(max_length=16)
+    
+
+    def __str__(self):
+        return self.card_number
 
 class SampleBio(models.Model):
     text = models.TextField()

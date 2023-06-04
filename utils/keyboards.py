@@ -3,16 +3,16 @@ from telegram import ForceReply, Update, InlineKeyboardButton, InlineKeyboardMar
 def main_menu_keyboard():
     keyboard = [
         [
-            KeyboardButton('افزودن اکانت'),
-            KeyboardButton('مشاهده لیست اکانت ها')
+            KeyboardButton('➕ ارسال اکانت ➕'),
+            KeyboardButton('حساب کاربری 🔒')
 
         ],
         [
-            KeyboardButton('مشاهده موجودی'),
-            KeyboardButton('پشتیبانی')
+            KeyboardButton('تسویه حساب ♻️'),
+            KeyboardButton('پشتیبانی 📮')
         ]
     ]
-    return ReplyKeyboardMarkup(keyboard)
+    return ReplyKeyboardMarkup(keyboard,resize_keyboard=True)
 
 def add_account_keyboard():
     keyboard = [
@@ -21,7 +21,7 @@ def add_account_keyboard():
         ],
 
     ]
-    return ReplyKeyboardMarkup(keyboard)
+    return ReplyKeyboardMarkup(keyboard,resize_keyboard=True)
 
 def check_clear_session_keyboard():
     keyboard = [

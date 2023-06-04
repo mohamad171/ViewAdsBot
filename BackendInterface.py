@@ -39,8 +39,29 @@ class BackendInterface:
                 account.session_file.save(f"{phone}.session", File(f))
             account.save()
             os.remove(f"{phone}.session")
-            return True,"اکانت با موفقیت اضافه شد.\n برای ادامه لطفا از اکانت خارج شوید و سپس روی دکمه تایید کلیک کنید"
+            return True,"اکانت با موفقیت دریافت شد ✅\nلطفا بعد از خارج شدن از اکانت روی دکمه زیر بزنید تا اکانت تایید شود ✅"
         return False,"اکانت قبلا اضافه شده"
+
+    def get_account_details(self,user):
+        account_count = Account.objects.filter(user=user,is_active=True).count()
+        return user.chat_id,account_count
+
+    def get_checkout_account_count(self,user):
+        account_count = Account.objects.filter(user=user,is_active=True,is_checkout=False).count()
+        return account_count
+
+    def add_checkout_request(self,user,card_number,account_count):
+        count = Account.objects.filter(user=user,is_active=True,is_checkout=False).count()
+        
+        if count >= account_count:
+            ch = Checkout()
+            ch.user = user
+            ch.account_count = account_count
+            ch.card_number = card_number
+            ch.save()
+            return True
+        return False
+
 
     def activate_account(self,user,phone):
         account = Account.objects.filter(phone=phone,user=user,is_active=False).first()

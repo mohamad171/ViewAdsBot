@@ -53,7 +53,7 @@ class BackendInterface:
     def add_checkout_request(self,user,card_number,account_count):
         count = Account.objects.filter(user=user,is_active=True,is_checkout=False).count()
         
-        if count >= account_count:
+        if count >= int(account_count):
             ch = Checkout()
             ch.user = user
             ch.account_count = account_count

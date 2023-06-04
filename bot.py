@@ -11,6 +11,7 @@ from utils.keyboards import *
 from utils.regexes import *
 from ClientApiInterface import send_code , signin, client_set_password,check_session
 import re
+from telegram.ext.filters import ChatType
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -24,6 +25,12 @@ backend_interface = BackendInterface.BackendInterface()
 SET_PHONE_NUMBER, SET_CODE,SET_PASSWORD = range(3)
 SET_CARD_NUMBER, SET_ACCOUNT_COUNT = range(2)
 
+async def send_payment_message(message,context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=-1001677338368,text=message)
+
+async def send_log_message(message,context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=-1001789928033,text=message)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     try:
@@ -35,8 +42,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("برای ادامه یکی از گزینه های زیر را انتخاب کنید",reply_markup=main_menu_keyboard())
 
 async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("برای ادامه دکمه تایید را بزنید",reply_markup=check_clear_session_keyboard())
+    await update.channel_post.reply_text(update.channel_post.chat_id)
 
+async def chat_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.channel_post.reply_text(update.channel_post.chat_id)
 
 async def add_account_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -71,6 +80,7 @@ async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def set_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     password = update.message.text
     client = add_phone_data[update.message.chat_id]["client"]
+    phone = add_phone_data[update.message.chat_id]["phone"]
     r = await client_set_password(client,password)
     if r == "invalid":
         await update.message.reply_text("رمز عبور صحیح نیست لطفا مجددا تلاش کنید",reply_markup=cancele_keyboard())
@@ -78,8 +88,9 @@ async def set_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     user = backend_interface.get_user(update.message.chat_id)
     if user:
-        status, result = backend_interface.add_account(user, add_phone_data[update.message.chat_id]["phone"],r)
+        status, result = backend_interface.add_account(user, phone,r)
         if status:
+            await send_log_message(f"اکانت جدید با شماره{phone} توسط {user.chat_id} در سیستم ثبت شد",context=context)
             await update.message.reply_text(f"{result}",reply_markup=check_clear_session_keyboard())
         else:
             await update.message.reply_text(f"{result}", reply_markup=main_menu_keyboard())
@@ -106,6 +117,7 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if user:
         status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"],r)
         if status:
+            await send_log_message(f"اکانت جدید با شماره{phone} توسط {user.chat_id} در سیستم ثبت شد",context=context)
             await update.message.reply_text(f"{result}",reply_markup=check_clear_session_keyboard())
         else:
             await update.message.reply_text(f"{result}", reply_markup=main_menu_keyboard())
@@ -133,6 +145,7 @@ async def accept_logout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if result:
         r = backend_interface.activate_account(user,phone)
         if r:
+            await send_log_message(f"شماره {phone} با موفقیت فعال شد",context=context)
             await query.message.reply_text("اکانت با موفقیت تایید شد و اعتبار به موجودی شما اضافه شد",reply_markup=main_menu_keyboard())
         else:
             await query.message.reply_text("این اکانت قبلا تایید شده است",
@@ -165,12 +178,13 @@ async def set_account_count(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     user = backend_interface.get_user(update.message.chat_id)
     checkout_account_count = backend_interface.get_checkout_account_count(user)
     try:
-        if int(update.message.text) <= checkout_account_count and int(update.message.text) > 0:
+        if int(update.message.text) <= int(checkout_account_count) and int(update.message.text) > 0:
             add_checkout_data[update.message.chat_id]["account_count"] = update.message.text
             count = add_checkout_data[update.message.chat_id]["account_count"]
             card_number = add_checkout_data[update.message.chat_id]["card_number"]
             result = backend_interface.add_checkout_request(user,card_number,count)
             if result:
+                await send_payment_message(f"درخواست جدید برای تسویه حساب {count} اکانت توسط {user.chat_id} با شماره کارت {card_number} ثبت شد",context=context)
                 await update.message.reply_text("درخواست شما با موفقیت ثبت شد ✅",reply_markup=main_menu_keyboard())
             else:
                 await update.message.reply_text("خطایی رخ داده با پشتیبانی تماس بگیرید",reply_markup=cancele_keyboard())
@@ -181,7 +195,9 @@ async def set_account_count(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         else:
             await update.message.reply_text("عدد وارد شده بیشتر از تعداد اکانت قابل تسویه است",reply_markup=cancele_keyboard())
             return SET_ACCOUNT_COUNT
-    except:
+    except Exception as ex:
+        print(ex)
+
         pass
     await update.message.reply_text("عدد وارد شده صحیح نمیباشد")
     return SET_ACCOUNT_COUNT
@@ -228,14 +244,14 @@ def main() -> None:
     )
     # application.add_handler(MessageHandler(filters.Regex("\/start [a-z0-9]{8}"), join_to_room))
     application.add_handler(MessageHandler(filters.Regex("\/start"), start))
-    application.add_handler(MessageHandler(filters.Regex("\/debug"), debug))
+    application.add_handler(MessageHandler(filters.ChatType.CHANNEL, debug))
     application.add_handler(CallbackQueryHandler(accept_logout,"accept_logout"))
     application.add_handler(add_account_conv_handler)
     application.add_handler(checkout_conv_handler)
     
     application.add_handler(MessageHandler(filters.Regex("حساب کاربری 🔒"), user_account))
     application.add_handler(MessageHandler(filters.Regex("پشتیبانی 📮"), support))
-
+    application.add_handler(MessageHandler("chatinfo",chat_info))
     application.run_polling()
 
 

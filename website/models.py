@@ -32,8 +32,8 @@ class ProxyInfo(models.Model):
         return self.ip
 
 class Account(models.Model):
-    user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,related_name="accounts")
-    cli_info = models.ForeignKey(CliInfo,on_delete=models.SET_NULL,null=True,related_name="cli_accounts")
+    user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,blank=True,related_name="accounts")
+    cli_info = models.ForeignKey(CliInfo,on_delete=models.SET_NULL,null=True,blank=True,related_name="cli_accounts")
     proxy_info = models.ForeignKey(ProxyInfo,on_delete=models.SET_NULL,null=True,related_name="proxy_accounts")
     phone = models.CharField(max_length=15)
     session_string = models.TextField(null=True)
@@ -41,7 +41,7 @@ class Account(models.Model):
     is_active = models.BooleanField(default=False)
     is_checkout = models.BooleanField(default=False)
     bio = models.TextField(null=True,blank=True)
-    image_profile = models.ImageField(upload_to="account/profiles",null=True)
+    image_profile = models.ImageField(upload_to="account/profiles",null=True,blank=True)
     session_file = models.FileField(upload_to="sessions",null=True)
 
     def __str__(self):

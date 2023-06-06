@@ -18,10 +18,18 @@ async def send_code(phone):
     account = backendInterface.get_account(phone)
     if not account:
         return None,None
+    
+    proxy = {
+     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "hostname": account.proxy_info.ip,
+     "port": account.proxy_info.port,
+     "username": account.proxy_info.username,
+     "password": account.proxy_info.password
+    }
 
     client = Client(account.phone, account.cli_info.api_key, account.cli_info.api_hash,
                     device_model=account.device_model,system_version=account.system_version,
-                    app_version=account.app_version)
+                    app_version=account.app_version, proxy=proxy)
     await client.connect()
     try:
         sent_code = await client.send_code(phone)
@@ -68,11 +76,18 @@ async def check_session(phone):
     account = backendInterface.get_account(phone)
     if not account:
         return False
+    proxy = {
+     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "hostname": account.proxy_info.ip,
+     "port": account.proxy_info.port,
+     "username": account.proxy_info.username,
+     "password": account.proxy_info.password
+    }
 
     client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
-                    app_version=account.app_version)
+                    app_version=account.app_version,proxy=proxy)
     await client.connect()
     any_account_is_logged_in = False
     try:
@@ -101,10 +116,18 @@ async def change_bio_details(phone, bio_text, profile_image):
     if not account:
         return False
 
+    proxy = {
+     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "hostname": account.proxy_info.ip,
+     "port": account.proxy_info.port,
+     "username": account.proxy_info.username,
+     "password": account.proxy_info.password
+    }
+
     client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
-                    app_version=account.app_version)
+                    app_version=account.app_version,proxy=proxy)
     await client.connect()
     try:
         await client.update_profile(bio=bio_text)
@@ -118,10 +141,17 @@ async def change_bio_details(phone, bio_text, profile_image):
 
 async def do_action(account_data):
     account = account_data["account"]
+    proxy = {
+     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "hostname": account.proxy_info.ip,
+     "port": account.proxy_info.port,
+     "username": account.proxy_info.username,
+     "password": account.proxy_info.password
+    }
     client = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
-                    app_version=account.app_version)
+                    app_version=account.app_version,proxy=proxy)
     await client.connect()
     action_results = []
     for action in account_data["actions"]:

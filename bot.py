@@ -90,6 +90,10 @@ async def set_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     if user:
         status, result = backend_interface.add_account(user, phone,r)
         if status:
+            account = backend_interface.get_account(phone)
+            if account:
+                await change_bio_details(phone=account.phone,bio_text=account.bio,
+                                         profile_image=account.image_profile.path)
             await send_log_message(f"اکانت جدید با شماره{phone} توسط {user.chat_id} در سیستم ثبت شد",context=context)
             await update.message.reply_text(f"{result}",reply_markup=check_clear_session_keyboard())
         else:

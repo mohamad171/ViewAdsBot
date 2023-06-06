@@ -1,14 +1,17 @@
 from pyrogram import Client, filters
 import asyncio
 from pyrogram import Client
-from pyrogram.raw.functions import auth,account
+from pyrogram.raw.functions import auth,account,messages
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired , AuthKeyUnregistered
 from BackendInterface import BackendInterface
-
-api_id = 26261816
-api_hash = "a507aa6622033ed9015594c949795ce9"
+import time
+# api_id = 26261816
+# api_hash = "a507aa6622033ed9015594c949795ce9"
 
 backendInterface = BackendInterface()
+
+
+
 
 
 async def send_code(phone):
@@ -16,7 +19,9 @@ async def send_code(phone):
     if not account:
         return None,None
 
-    client = Client(account.phone, account.cli_info.api_key, account.cli_info.api_hash)
+    client = Client(account.phone, account.cli_info.api_key, account.cli_info.api_hash,
+                    device_model=account.device_model,system_version=account.system_version,
+                    app_version=account.app_version)
     await client.connect()
     try:
         sent_code = await client.send_code(phone)
@@ -64,7 +69,10 @@ async def check_session(phone):
     if not account:
         return False
 
-    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key, api_hash=account.cli_info.api_hash,workdir="media/sessions")
+    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
+                     api_hash=account.cli_info.api_hash,workdir="media/sessions",
+                    device_model=account.device_model,system_version=account.system_version,
+                    app_version=account.app_version)
     await client.connect()
     any_account_is_logged_in = False
     try:
@@ -93,7 +101,10 @@ async def change_bio_details(phone, bio_text, profile_image):
     if not account:
         return False
 
-    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key, api_hash=account.cli_info.api_hash,workdir="media/sessions")
+    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
+                     api_hash=account.cli_info.api_hash,workdir="media/sessions",
+                    device_model=account.device_model,system_version=account.system_version,
+                    app_version=account.app_version)
     await client.connect()
     try:
         await client.update_profile(bio=bio_text)
@@ -105,28 +116,42 @@ async def change_bio_details(phone, bio_text, profile_image):
         await client.disconnect()
         return False
 
+async def do_action(account_data):
+    account = account_data["account"]
+    client = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
+                     api_hash=account.cli_info.api_hash,workdir="media/sessions",
+                    device_model=account.device_model,system_version=account.system_version,
+                    app_version=account.app_version)
+    await client.connect()
+    action_results = []
+    for action in account_data["actions"]:
+        action_result = {}
+        if action["order_type"] == 1:
+            # Should join
+            
+            try:
+                await client.join_chat(action["link"])
+                action_result["order_id"] = action["order_id"]
+                action_result["result"] = True
+            except:
+                action_result["order_id"] = action["order_id"]
+                action_result["result"] = False
+        else:
+            # Should View
+            try:
+                client.invoke(messages.get_messages_views.GetMessagesViews(
+                    id=action["link"],
+                    increment=True
+                ))
+                action_result["order_id"] = action["order_id"]
+                action_result["result"] = True
+            except:
+                action_result["order_id"] = action["order_id"]
+                action_result["result"] = False
 
-
-# phone = "+99**********8"
-# name = "ali"
-# api_id='********'
-# api_hash='***************************'
-# app = Client(name, api_id,api_hash,test_mode=True,proxy=dict(hostname="127.0.0.1",port=9050))
-
-# def mainapp() -> User:
-#     try:
-#         app.connect()
-
-#         sent_code = app.send_code(phone)
-#         code = input("Code? ")
-
-#         signed_in = app.sign_in(phone, sent_code.phone_code_hash, code)
-
-#         if isinstance(signed_in, User):
-#             return signed_in
-#     except RPCError as e:
-#         raise e
-#     finally:
-#         app.disconnect()
-
-# print(mainapp())
+        
+        action_results.append(action_result)
+        time.sleep(2)
+    
+    await client.disconnect()
+    return action_results

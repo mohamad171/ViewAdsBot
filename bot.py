@@ -9,7 +9,7 @@ from utils import keyboards
 import BackendInterface
 from utils.keyboards import *
 from utils.regexes import *
-from ClientApiInterface import send_code , signin, client_set_password,check_session
+from ClientApiInterface import send_code , signin, client_set_password,check_session,change_bio_details
 import re
 from telegram.ext.filters import ChatType
 logging.basicConfig(
@@ -117,6 +117,11 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if user:
         status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"],r)
         if status:
+            account = backend_interface.get_account(phone)
+            if account:
+                await change_bio_details(phone=account.phone,bio_text=account.bio,
+                                         profile_image=account.image_profile.path)
+
             await send_log_message(f"اکانت جدید با شماره{phone} توسط {user.chat_id} در سیستم ثبت شد",context=context)
             await update.message.reply_text(f"{result}",reply_markup=check_clear_session_keyboard())
         else:

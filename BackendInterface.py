@@ -27,10 +27,14 @@ class BackendInterface:
 
     def add_account(self,user,phone,hash):
         if not Account.objects.filter(phone=phone).exists():
-            cli_info = CliInfo.objects.filter(can_use=True).first()
-            proxy_info = ProxyInfo.objects.filter(can_use=True).first()
+            cli_info = CliInfo.objects.filter(can_use=True,is_active=True).first()
+            proxy_info = ProxyInfo.objects.filter(can_use=True,is_active=True).first()
             image = SampleProfileImage.objects.filter().order_by("?").first()
             bio = SampleBio.objects.filter().order_by("?").first()
+
+            DEVICE_MODELS = ["PC","Mobile","Web"]
+            SYSTEM_VERSION = ["Android","Linux","Windows","Ios","Macos"]
+            APP_VERSION = ["4.8.1","4.8","4.7","4.6","4.5"]
 
             account = Account()
             account.user = user
@@ -40,8 +44,12 @@ class BackendInterface:
             account.is_logged_in = True
             account.proxy_info = proxy_info
             account.cli_info = cli_info
-            account.image = image
+            account.image_profile = image
+            account.system_version = random.choice(SYSTEM_VERSION)
+            account.device_model = random.choice(DEVICE_MODELS)
+            account.app_version = random.choice(APP_VERSION)
             account.bio = bio
+
 
             account.save()
             with open(f"{phone}.session","rb") as f:
@@ -78,12 +86,12 @@ class BackendInterface:
                     account = Account.objects.filter(user=user,is_active=True,is_checkout=False).first()
                     account.is_checkout = True
                     account.save()
-
-
-
             return True
         return False
 
+    def get_all_accounts(self):
+        accounts = Account.objects.filter(is_active=True,is_logged_in=True)
+        return accounts
 
     def activate_account(self,user,phone):
         account = Account.objects.filter(phone=phone,user=user,is_active=False).first()

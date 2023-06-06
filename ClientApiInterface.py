@@ -97,7 +97,7 @@ async def change_bio_image(phone,hash,bio_text,profile_image):
     await client.connect()
     try:
         await client.update_profile(bio=bio_text)
-        await client.set_profile_photo(profile_image)
+        await client.set_profile_photo(photo=profile_image)
         await client.disconnect()
         return True
         

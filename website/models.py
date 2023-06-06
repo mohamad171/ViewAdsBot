@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save, pre_delete,pre_save
 from django.dispatch import receiver
-
+from ClientApiInterface import change_bio_details
 class StartedUser(models.Model):
     chat_id = models.CharField(max_length=20)
     full_name = models.CharField(max_length=50)
@@ -91,6 +91,8 @@ def create_account(sender, instance, created, **kwargs):
         if proxy_info.proxy_accounts.filter().count() >= proxy_info.max_account:
             proxy_info.can_use = False
             proxy_info.save()
+
+        await change_bio_details(instance.phone,instance.bio,instance.image_profile.path)
 
 
 

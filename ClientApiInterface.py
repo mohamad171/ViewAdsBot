@@ -88,12 +88,12 @@ async def check_session(phone):
 
 
 
-async def change_bio_image(phone,hash,bio_text,profile_image):
+async def change_bio_details(phone, bio_text, profile_image):
     account = backendInterface.get_account(phone)
     if not account:
         return False
 
-    client = Client(phone, api_id=account.cli_info.api_key, api_hash=account.cli_info.api_hash,session_string=hash)
+    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key, api_hash=account.cli_info.api_hash,workdir="media/sessions")
     await client.connect()
     try:
         await client.update_profile(bio=bio_text)

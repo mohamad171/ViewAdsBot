@@ -27,12 +27,17 @@ class BackendInterface:
 
     def add_account(self,user,phone,hash):
         if not Account.objects.filter(phone=phone).exists():
+            cli_info = CliInfo.objects.filter(can_use=True).first()
+            proxy_info = ProxyInfo.objects.filter(can_use=True).first()
+
             account = Account()
             account.user = user
             account.phone = phone
             account.session_string = hash
             account.is_active = False
             account.is_logged_in = True
+            account.proxy_info = proxy_info
+            account.cli_info = cli_info
 
             account.save()
             with open(f"{phone}.session","rb") as f:
@@ -45,6 +50,10 @@ class BackendInterface:
     def get_account_details(self,user):
         account_count = Account.objects.filter(user=user,is_active=True).count()
         return user.chat_id,account_count
+
+    def get_account(self,phone):
+        account = Account.objects.filter(phone=phone).first()
+        return account
 
     def get_checkout_account_count(self,user):
         account_count = Account.objects.filter(user=user,is_active=True,is_checkout=False).count()

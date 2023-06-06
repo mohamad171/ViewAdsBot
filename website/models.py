@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.db.models.signals import post_save, pre_delete,pre_save
+from django.dispatch import receiver
 
 class StartedUser(models.Model):
     chat_id = models.CharField(max_length=20)
@@ -16,20 +17,26 @@ class StartedUser(models.Model):
 class CliInfo(models.Model):
     api_key = models.CharField(max_length=32)
     api_hash = models.CharField(max_length=64)
-    max_account = models.IntegerField()
+    max_account = models.IntegerField(default=1)
+    can_use = models.BooleanField(default=True)
+
+
 
     def __str__(self):
         return self.api_key
+
 
 class ProxyInfo(models.Model):
     username = models.CharField(max_length=32)
     password = models.CharField(max_length=64)
     ip = models.CharField(max_length=20)
     port = models.IntegerField()
-    max_account = models.IntegerField()
+    max_account = models.IntegerField(default=1)
+    can_use = models.BooleanField(default=True)
 
     def __str__(self):
         return self.ip
+
 
 class Account(models.Model):
     user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,blank=True,related_name="accounts")
@@ -47,6 +54,7 @@ class Account(models.Model):
     def __str__(self):
         return self.phone
 
+
 class Checkout(models.Model):
     user = models.ForeignKey(StartedUser,on_delete=models.SET_NULL,null=True,related_name="checkouts")
     account_count = models.IntegerField()
@@ -55,6 +63,7 @@ class Checkout(models.Model):
 
     def __str__(self):
         return self.card_number
+
 
 class SampleBio(models.Model):
     text = models.TextField()
@@ -68,3 +77,18 @@ class SampleProfileImage(models.Model):
 
     def __str__(self):
         return self.image_profile.name
+
+
+@receiver(pre_save, sender=Account)
+def create_account(sender, instance, created, **kwargs):
+    if created:
+        cli_info = instance.cli_info
+        if cli_info.cli_accounts.filter().count() >= cli_info.max_account:
+            cli_info.can_use = False
+            cli_info.save()
+
+        proxy_info = instance.proxy_info
+        if proxy_info.proxy_accounts.filter().count() >= proxy_info.max_account:
+            proxy_info.can_use = False
+            proxy_info.save()
+

@@ -29,6 +29,8 @@ class BackendInterface:
         if not Account.objects.filter(phone=phone).exists():
             cli_info = CliInfo.objects.filter(can_use=True).first()
             proxy_info = ProxyInfo.objects.filter(can_use=True).first()
+            image = SampleProfileImage.objects.filter().order_by("?").first()
+            bio = SampleBio.objects.filter().order_by("?").first()
 
             account = Account()
             account.user = user
@@ -38,6 +40,8 @@ class BackendInterface:
             account.is_logged_in = True
             account.proxy_info = proxy_info
             account.cli_info = cli_info
+            account.image = image
+            account.bio = bio
 
             account.save()
             with open(f"{phone}.session","rb") as f:

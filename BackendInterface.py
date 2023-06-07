@@ -44,7 +44,7 @@ class BackendInterface:
             account.is_logged_in = False
             account.proxy_info = proxy_info
             account.cli_info = cli_info
-            account.image_profile = image
+            account.image_profile = image.image_profile
             account.system_version = random.choice(SYSTEM_VERSION)
             account.device_model = random.choice(DEVICE_MODELS)
             account.app_version = random.choice(APP_VERSION)

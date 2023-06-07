@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 import asyncio
 from pyrogram import Client
-from pyrogram.raw.functions import auth,account,messages
+from pyrogram.raw.functions import auth,account as rawaccount,messages
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired , AuthKeyUnregistered
 from BackendInterface import BackendInterface
 import time
@@ -91,7 +91,7 @@ async def check_session(phone):
     await client.connect()
     any_account_is_logged_in = False
     try:
-        result = await client.invoke(account.GetAuthorizations())
+        result = await client.invoke(rawaccount.GetAuthorizations())
         for authoriz in result.authorizations:
             if authoriz.current != True:
                 any_account_is_logged_in = True

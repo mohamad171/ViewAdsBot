@@ -26,7 +26,9 @@ class BackendInterface:
         return None
 
     def add_account(self,user,phone):
-        if not Account.objects.filter(phone=phone).exists():
+        account = Account.objects.filter(phone=phone).first()
+
+        if not account:
             cli_info = CliInfo.objects.filter(can_use=True,is_active=True).first()
             proxy_info = ProxyInfo.objects.filter(can_use=True,is_active=True).first()
             image = SampleProfileImage.objects.filter().order_by("?").first()
@@ -52,6 +54,8 @@ class BackendInterface:
             account.save()
             return True,None
 
+        if account.is_logged_in == False:
+            return True,None
         return False,"اکانت قبلا اضافه شده"
 
     def set_account_loggedin(self,phone):

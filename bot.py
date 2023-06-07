@@ -253,14 +253,14 @@ def main() -> None:
     )
     # application.add_handler(MessageHandler(filters.Regex("\/start [a-z0-9]{8}"), join_to_room))
     application.add_handler(MessageHandler(filters.Regex("\/start"), start))
-    application.add_handler(MessageHandler(filters.ChatType.CHANNEL, debug))
+    # application.add_handler(MessageHandler(filters.ChatType.CHANNEL, debug))
     application.add_handler(CallbackQueryHandler(accept_logout,"accept_logout"))
     application.add_handler(add_account_conv_handler)
     application.add_handler(checkout_conv_handler)
     
     application.add_handler(MessageHandler(filters.Regex("حساب کاربری 🔒"), user_account))
     application.add_handler(MessageHandler(filters.Regex("پشتیبانی 📮"), support))
-    application.add_handler(MessageHandler("chatinfo",chat_info))
+    # application.add_handler(MessageHandler("chatinfo",chat_info))
     application.run_polling()
 
 

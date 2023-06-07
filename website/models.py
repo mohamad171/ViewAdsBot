@@ -110,7 +110,7 @@ class Order(models.Model):
         return self.get_order_type_display()
 
     
-@receiver(pre_save, sender=Account)
+@receiver(post_save, sender=Account)
 def create_account(sender, instance, created, **kwargs):
     if created:
         cli_info = instance.cli_info

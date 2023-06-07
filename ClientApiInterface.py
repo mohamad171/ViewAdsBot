@@ -35,7 +35,7 @@ async def send_code(phone):
         sent_code = await client.send_code(phone)
         # client.disconnect()
         return sent_code,client
-    except:
+    except Exception as ex:
         return None,None
 
 

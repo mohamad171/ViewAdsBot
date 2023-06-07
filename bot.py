@@ -65,13 +65,19 @@ async def set_phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if re.match(phone_regex,phone):
         add_phone_data[update.message.chat_id] = {}
         add_phone_data[update.message.chat_id]["phone"] = phone
-        r,client = await send_code(phone)
-        if r:
-            add_phone_data[update.message.chat_id]["sent_code"] = r
-            add_phone_data[update.message.chat_id]["client"] = client
-            await update.message.reply_text(f"کد برای شماره {phone} ارسال شد",reply_markup=cancele_keyboard())
-            await update.message.reply_text("کد ارسال شده را وارد کنید",reply_markup=cancele_keyboard())
-            return SET_CODE
+        user = backend_interface.get_user(update.message.chat_id)
+        result,msg = backend_interface.add_account(user,phone)
+        if result:
+            r,client = await send_code(phone)
+            if r:
+                add_phone_data[update.message.chat_id]["sent_code"] = r
+                add_phone_data[update.message.chat_id]["client"] = client
+                await update.message.reply_text(f"کد برای شماره {phone} ارسال شد",reply_markup=cancele_keyboard())
+                await update.message.reply_text("کد ارسال شده را وارد کنید",reply_markup=cancele_keyboard())
+                return SET_CODE
+        else:
+            await update.message.reply_text(msg,reply_markup=main_menu_keyboard())
+            return ConversationHandler.END
         
     await update.message.reply_text("شماره موبایل را صحیح وارد کنید نمونه: +19901102345",reply_markup=cancele_keyboard())
     return SET_PHONE_NUMBER
@@ -88,7 +94,7 @@ async def set_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     user = backend_interface.get_user(update.message.chat_id)
     if user:
-        status, result = backend_interface.add_account(user, phone,r)
+        status,result = backend_interface.set_account_loggedin(phone)
         if status:
             account = backend_interface.get_account(phone)
             if account:
@@ -119,7 +125,8 @@ async def set_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     user = backend_interface.get_user(update.message.chat_id)
     if user:
-        status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"],r)
+        # status,result = backend_interface.add_account(user,add_phone_data[update.message.chat_id]["phone"],r)
+        status,result = backend_interface.set_account_loggedin(add_phone_data[update.message.chat_id]["phone"])
         if status:
             account = backend_interface.get_account(phone)
             if account:

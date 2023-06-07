@@ -25,7 +25,7 @@ class BackendInterface:
             return s_u
         return None
 
-    def add_account(self,user,phone,hash):
+    def add_account(self,user,phone):
         if not Account.objects.filter(phone=phone).exists():
             cli_info = CliInfo.objects.filter(can_use=True,is_active=True).first()
             proxy_info = ProxyInfo.objects.filter(can_use=True,is_active=True).first()
@@ -39,9 +39,9 @@ class BackendInterface:
             account = Account()
             account.user = user
             account.phone = phone
-            account.session_string = hash
+            account.session_string = None
             account.is_active = False
-            account.is_logged_in = True
+            account.is_logged_in = False
             account.proxy_info = proxy_info
             account.cli_info = cli_info
             account.image_profile = image
@@ -49,15 +49,22 @@ class BackendInterface:
             account.device_model = random.choice(DEVICE_MODELS)
             account.app_version = random.choice(APP_VERSION)
             account.bio = bio
-
-
             account.save()
+            return True,None
+
+        return False,"اکانت قبلا اضافه شده"
+
+    def set_account_loggedin(self,phone):
+        account = self.get_account(phone)
+        if account:
+            account.is_logged_in = True
             with open(f"{phone}.session","rb") as f:
                 account.session_file.save(f"{phone}.session", File(f))
             account.save()
             os.remove(f"{phone}.session")
             return True,"اکانت با موفقیت دریافت شد ✅\nلطفا بعد از خارج شدن از اکانت روی دکمه زیر بزنید تا اکانت تایید شود ✅"
-        return False,"اکانت قبلا اضافه شده"
+        else:
+            return False,"اکانت یافت نشد"
 
     def get_account_details(self,user):
         account_count = Account.objects.filter(user=user,is_active=True).count()

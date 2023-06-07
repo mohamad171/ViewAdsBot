@@ -20,7 +20,7 @@ async def send_code(phone):
         return None,None
     
     proxy = {
-     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,
      "port": account.proxy_info.port,
      "username": account.proxy_info.username,
@@ -77,7 +77,7 @@ async def check_session(phone):
     if not account:
         return False
     proxy = {
-     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,
      "port": account.proxy_info.port,
      "username": account.proxy_info.username,
@@ -117,7 +117,7 @@ async def change_bio_details(phone, bio_text, profile_image):
         return False
 
     proxy = {
-     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,
      "port": account.proxy_info.port,
      "username": account.proxy_info.username,
@@ -142,7 +142,7 @@ async def change_bio_details(phone, bio_text, profile_image):
 async def do_action(account_data):
     account = account_data["account"]
     proxy = {
-     "scheme": "http",  # "socks4", "socks5" and "http" are supported
+     "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,
      "port": account.proxy_info.port,
      "username": account.proxy_info.username,
@@ -169,7 +169,7 @@ async def do_action(account_data):
         else:
             # Should View
             try:
-                client.invoke(messages.get_messages_views.GetMessagesViews(
+                await client.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))

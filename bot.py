@@ -40,7 +40,11 @@ def load_phone_data():
     add_phone_data = {}
     if os.path.exists("add_phone_data.pickle"):
         f = open('add_phone_data.pickle', 'rb')
-        add_phone_data = pickle.load(f)
+
+        try:
+            add_phone_data = pickle.load(f)
+        except:
+            add_phone_data = {}
 
     return add_phone_data
 
@@ -50,7 +54,11 @@ def load_checkout_data():
     if os.path.exists("add_checkout_data.pickle"):
 
         f = open('add_checkout_data.pickle', 'rb')
-        add_checkout_data = pickle.load(f)
+        try:
+            add_checkout_data = pickle.load(f)
+        except:
+            add_checkout_data = {}
+
 
 
     return add_checkout_data

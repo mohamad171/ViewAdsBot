@@ -28,8 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ["https://viewads.moderndata.ir/",
-                        "https://www.viewads.moderndata.ir/",
+CSRF_TRUSTED_ORIGINS = ["https://viewads.moderndata.ir",
+                        "https://www.viewads.moderndata.ir",
                         ]
 
 CORS_ALLOW_ALL_ORIGINS = True

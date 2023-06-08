@@ -39,16 +39,20 @@ def save_data():
 def load_phone_data():
     add_phone_data = {}
     if os.path.exists("add_phone_data.pickle"):
-        with open('add_phone_data.pickle', 'rb') as handle:
-            add_phone_data = pickle.load(handle)
+        f = open('add_phone_data.pickle', 'rb')
+        add_phone_data = pickle.load(f)
+
     return add_phone_data
 
 
 def load_checkout_data():
     add_checkout_data = {}
     if os.path.exists("add_checkout_data.pickle"):
-        with open('add_checkout_data.pickle', 'rb') as handle:
-            add_checkout_data = pickle.load(handle)
+
+        f = open('add_checkout_data.pickle', 'rb')
+        add_checkout_data = pickle.load(f)
+
+
     return add_checkout_data
 
 

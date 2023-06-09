@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save, pre_delete,pre_save
+from django.db.models.signals import post_save, pre_delete,pre_save,post_delete
 from django.dispatch import receiver
 
 class StartedUser(models.Model):
@@ -124,6 +124,12 @@ def create_account(sender, instance, created, **kwargs):
             proxy_info.save()
 
         # change_bio_details(instance.phone,instance.bio,instance.image_profile.path)
-
+        
+@receiver(post_delete, sender=Account)
+def post_delete_account(sender, instance, *args, **kwargs):
+    try:
+        instance.session_file.delete(save=False)
+    except:
+        pass
 
 

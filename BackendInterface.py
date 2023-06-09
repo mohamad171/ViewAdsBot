@@ -34,6 +34,9 @@ class BackendInterface:
             image = SampleProfileImage.objects.filter().order_by("?").first()
             bio = SampleBio.objects.filter().order_by("?").first()
 
+            if not cli_info or not proxy_info:
+                return False,"امکان افزودن اکانت درحا حاضر وجود ندارد"
+
             DEVICE_MODELS = ["PC","Mobile","Web"]
             SYSTEM_VERSION = ["Android","Linux","Windows","Ios","Macos"]
             APP_VERSION = ["4.8.1","4.8","4.7","4.6","4.5"]

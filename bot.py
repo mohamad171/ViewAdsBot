@@ -217,6 +217,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def accept_logout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
+    
     user = backend_interface.get_user(query.message.chat_id)
     # phone = "+989106664920"
     phone = add_phone_data[query.message.chat_id]["phone"]
@@ -225,10 +226,12 @@ async def accept_logout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if result:
         r = backend_interface.activate_account(user, phone)
         if r:
+            query.edit_message_reply_markup(reply_markup=None)
             await send_log_message(f"شماره {phone} با موفقیت فعال شد", context=context)
             await query.message.reply_text("اکانت با موفقیت تایید شد و اعتبار به موجودی شما اضافه شد",
                                            reply_markup=main_menu_keyboard())
         else:
+            query.edit_message_reply_markup(reply_markup=None)
             await query.message.reply_text("این اکانت قبلا تایید شده است",
                                            reply_markup=main_menu_keyboard())
 

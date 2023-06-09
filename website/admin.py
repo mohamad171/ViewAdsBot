@@ -34,3 +34,7 @@ class ProxyInfoAdmin(admin.ModelAdmin):
 class CheckoutAdmin(admin.ModelAdmin):
     list_display = ["id","user","account_count","card_number"]
     
+@admin.register(Setting)
+class SettingAdmin(admin.ModelAdmin):
+    list_display = ["id","payment_log_channel_id","account_log_channel_id"]
+    

@@ -98,7 +98,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def debug(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.channel_post.reply_text(update.channel_post.chat_id)
+    if update.message.text == "chatinfo":
+        await update.channel_post.reply_text(update.channel_post.chat_id)
 
 
 async def chat_info(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -24,6 +24,9 @@ class BackendInterface:
         if s_u:
             return s_u
         return None
+    
+    def get_setting(self):
+        return Setting.objects.filter(id=1).first()
 
     def add_account(self,user,phone):
         account = Account.objects.filter(phone=phone).first()

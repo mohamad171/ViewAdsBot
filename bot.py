@@ -77,11 +77,13 @@ SET_CARD_NUMBER, SET_ACCOUNT_COUNT = range(2)
 
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=-1001677338368, text=message)
+    setting = backend_interface.get_setting()
+    await context.bot.send_message(chat_id=setting.payment_log_channel_id, text=message)
 
 
 async def send_log_message(message, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=-1001789928033, text=message)
+    setting = backend_interface.get_setting()
+    await context.bot.send_message(chat_id=setting.account_log_channel_id, text=message)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -332,7 +334,7 @@ def main() -> None:
     )
     # application.add_handler(MessageHandler(filters.Regex("\/start [a-z0-9]{8}"), join_to_room))
     application.add_handler(MessageHandler(filters.Regex("\/start"), start))
-    # application.add_handler(MessageHandler(filters.ChatType.CHANNEL, debug))
+    application.add_handler(MessageHandler(filters.ChatType.CHANNEL, debug))
     application.add_handler(CallbackQueryHandler(accept_logout, "accept_logout"))
     application.add_handler(add_account_conv_handler)
     application.add_handler(checkout_conv_handler)

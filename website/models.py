@@ -109,6 +109,15 @@ class Order(models.Model):
     def __str__(self) -> str:
         return self.get_order_type_display()
 
+class Setting(models.Model):
+    payment_log_channel_id = models.CharField(max_length=20)
+    account_log_channel_id = models.CharField(max_length=20)
+    
+    
+
+
+
+
     
 @receiver(post_save, sender=Account)
 def create_account(sender, instance, created, **kwargs):

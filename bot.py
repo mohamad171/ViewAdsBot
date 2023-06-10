@@ -77,15 +77,21 @@ SET_CARD_NUMBER, SET_ACCOUNT_COUNT = range(2)
 
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
-    setting = backend_interface.get_setting()
-    print(setting.payment_log_channel_id)
-    await context.bot.send_message(chat_id=setting.payment_log_channel_id, text=message)
+    try:
+        setting = backend_interface.get_setting()
+        print(setting.payment_log_channel_id)
+        await context.bot.send_message(chat_id=setting.payment_log_channel_id, text=message)
+    except:
+        pass
 
 
 async def send_log_message(message, context: ContextTypes.DEFAULT_TYPE):
-    setting = backend_interface.get_setting()
-    print(setting.account_log_channel_id)
-    await context.bot.send_message(chat_id=setting.account_log_channel_id, text=message)
+    try:
+        setting = backend_interface.get_setting()
+        print(setting.account_log_channel_id)
+        await context.bot.send_message(chat_id=setting.account_log_channel_id, text=message)
+    except:
+        pass
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

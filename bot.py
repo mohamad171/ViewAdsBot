@@ -77,13 +77,21 @@ SET_CARD_NUMBER, SET_ACCOUNT_COUNT = range(2)
 
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
-    setting = backend_interface.get_setting()
-    await context.bot.send_message(chat_id=setting.payment_log_channel_id, text=message)
+    try:
+        setting = backend_interface.get_setting()
+        print(setting.payment_log_channel_id)
+        await context.bot.send_message(chat_id=setting.payment_log_channel_id, text=message)
+    except:
+        pass
 
 
 async def send_log_message(message, context: ContextTypes.DEFAULT_TYPE):
-    setting = backend_interface.get_setting()
-    await context.bot.send_message(chat_id=setting.account_log_channel_id, text=message)
+    try:
+        setting = backend_interface.get_setting()
+        print(setting.account_log_channel_id)
+        await context.bot.send_message(chat_id=setting.account_log_channel_id, text=message)
+    except:
+        pass
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -222,23 +230,29 @@ async def accept_logout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     # phone = "+989106664920"
     phone = add_phone_data[query.message.chat_id]["phone"]
     account = user.accounts.filter(phone=phone).first()
-    result = await check_session(account.phone)
+    result,is_ban = await check_session(account.phone)
     if result:
         r = backend_interface.activate_account(user, phone)
         if r:
-            query.edit_message_reply_markup(reply_markup=None)
+            await query.edit_message_reply_markup(reply_markup=None)
             await send_log_message(f"شماره {phone} با موفقیت فعال شد", context=context)
             await query.message.reply_text("اکانت با موفقیت تایید شد و اعتبار به موجودی شما اضافه شد",
                                            reply_markup=main_menu_keyboard())
         else:
-            query.edit_message_reply_markup(reply_markup=None)
+            await query.edit_message_reply_markup(reply_markup=None)
             await query.message.reply_text("این اکانت قبلا تایید شده است",
                                            reply_markup=main_menu_keyboard())
 
     else:
-        await query.message.reply_text(
-            "عملیات انجام نشد. لطفا بعد از پاک کردن تمامی نشست های فعال خود روی دکمه تایید کلیک کنید(نشست فعال ربات را حذف نکنید)",
-            reply_markup=check_clear_session_keyboard())
+        if is_ban:
+            await query.message.reply_text(
+                "اکانت توسط تلگرام دیلیت یا بن شده است",
+                reply_markup=check_clear_session_keyboard())
+            account.delete()
+        else:
+            await query.message.reply_text(
+                "عملیات انجام نشد. لطفا بعد از پاک کردن تمامی نشست های فعال خود روی دکمه تایید کلیک کنید(نشست فعال ربات را حذف نکنید)",
+                reply_markup=check_clear_session_keyboard())
 
 
 async def user_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

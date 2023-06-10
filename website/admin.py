@@ -38,3 +38,6 @@ class CheckoutAdmin(admin.ModelAdmin):
 class SettingAdmin(admin.ModelAdmin):
     list_display = ["id","payment_log_channel_id","account_log_channel_id"]
     
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ["id","order_type","count","user","accept_to_start","status","success_count","faild_count"]

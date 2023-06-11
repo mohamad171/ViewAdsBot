@@ -59,7 +59,7 @@ def run_orders(self):
 
         else:
             pass
-        print(accounts)
+        return accounts
     # for account in accounts:
     #     print(account)
     #     results = do_action(account_data=account)

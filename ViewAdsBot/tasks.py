@@ -74,6 +74,6 @@ def run_orders(self):
     #
     #     time.sleep(20)
     
-    for o in (join_orders + view_orders):
-        o.status = Order.OrderStatusChoices.FINISHED
-        o.save()
+    # for o in (join_orders + view_orders):
+    #     o.status = Order.OrderStatusChoices.FINISHED
+    #     o.save()

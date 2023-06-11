@@ -208,7 +208,7 @@ def do_action(account_data):
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)
-    client.connect()
+    client.start()
 
     action_results = []
     for action in account_data["actions"]:
@@ -243,7 +243,7 @@ def do_action(account_data):
         action_results.append(action_result)
 
     
-    client.disconnect()
+    client.stop()
 
     time.sleep(2)
     return action_results

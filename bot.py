@@ -88,7 +88,7 @@ def do_action_task(accounts):
     for account in accounts:
         with Pool() as pool:
             res = pool.apply_async(do_action, account, callback=callback)
-            res.wait()
+            # res.wait()
     #
     #     results = asyncio.create_task(do_action(account_data=account))
 

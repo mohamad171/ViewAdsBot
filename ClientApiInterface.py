@@ -194,6 +194,7 @@ async def change_bio_details(phone, bio_text, profile_image):
 
 def do_action(account_data):
     account = account_data["account"]
+    print(account.phone)
     proxy = {
      "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,

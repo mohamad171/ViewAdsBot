@@ -58,7 +58,8 @@ def run_orders(self):
     else:
         pass
 
-    # for account in accounts:
+    for account in accounts:
+        print(account)
     #     results = do_action(account_data=account)
     #     for result in results:
     #         order = Order.objects.filter(id=result["order_id"]).first()

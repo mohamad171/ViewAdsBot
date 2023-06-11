@@ -62,7 +62,9 @@ def run_orders(self):
         else:
             pass
         for account in accounts:
-            results = do_action(account_data=account)
+            loop = asyncio.get_event_loop()
+            results = loop.run_until_complete(do_action(account_data=account))
+
             for result in results:
                 order = Order.objects.filter(id=result["order_id"]).first()
                 if order:
@@ -86,4 +88,4 @@ def check_accounts(self):
     accounts = Account.objects.filter(is_active=True,is_logged_in=True)
     for account in accounts:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(check_is_ban(account))
+

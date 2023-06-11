@@ -17,7 +17,7 @@ from asgiref.sync import async_to_sync
 def get_orders(self):
     return "ok"
 @celery_app.task(bind=True)
-async def run_orders(self):
+def run_orders(self):
     from ClientApiInterface import do_action
     orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING,accept_to_start=True,start_at__lte=timezone.now())
     if orders.count() > 0:

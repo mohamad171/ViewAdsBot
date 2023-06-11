@@ -92,7 +92,7 @@ def do_action_task(accounts):
     # loop.run_until_complete(asyncio.wait(tasks))
     # loop.close()
     pool = ThreadPool(processes=10)
-    pool.map(do_action,accounts)
+    pool.map_async(do_action,accounts)
 
 
 

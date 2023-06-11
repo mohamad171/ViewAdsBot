@@ -215,7 +215,8 @@ def do_action(account_data):
                 client.join_chat(action["link"])
                 action_result["order_id"] = action["order_id"]
                 action_result["result"] = True
-            except:
+            except Exception as ex:
+                print(ex)
                 action_result["order_id"] = action["order_id"]
                 action_result["result"] = False
         else:
@@ -227,7 +228,8 @@ def do_action(account_data):
                 ))
                 action_result["order_id"] = action["order_id"]
                 action_result["result"] = True
-            except:
+            except Exception as ex:
+                print(ex)
                 action_result["order_id"] = action["order_id"]
                 action_result["result"] = False
 

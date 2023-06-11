@@ -55,12 +55,13 @@ def run_orders(self):
                         "order_type":view_order.order_type,
                         "link":view_order.link
                     })
-                    view_order.status = Order.OrderStatusChoices.RUNNING
-                    view_order.save()
+                    # view_order.status = Order.OrderStatusChoices.RUNNING
+                    # view_order.save()
 
         else:
             pass
-        return json.dumps(accounts)
+        print(accounts)
+        return "ok"
     # for account in accounts:
     #     print(account)
     #     results = do_action(account_data=account)

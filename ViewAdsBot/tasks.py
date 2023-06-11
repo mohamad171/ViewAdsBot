@@ -66,22 +66,19 @@ def run_orders(self):
         else:
             pass
         for account in accounts:
-            try:
-                results = asyncio.run(do_action(account_data=account))
+            loop = asyncio.get_event_loop()
+            results = loop.run_until_complete(do_action(account_data=account))
+            for result in results:
+                print("Setting result...")
+                order = Order.objects.filter(id=result["order_id"]).first()
+                if order:
+                    if result["result"]:
+                        order.success_count += 1
+                    else:
+                        order.faild_count += 1
+                    order.save()
 
-                for result in results:
-                    order = Order.objects.filter(id=result["order_id"]).first()
-                    if order:
-                        if result["result"]:
-                            order.success_count += 1
-                        else:
-                            order.faild_count += 1
-                        order.save()
-            except Exception as ex:
-                print(account)
-                print(ex)
-                pass
-
+            print("Sleeping for 20 sec...")
             time.sleep(20)
 
         for o in (join_orders + view_orders):

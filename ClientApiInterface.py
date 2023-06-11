@@ -201,6 +201,8 @@ async def do_action(account_data):
      "username": account.proxy_info.username,
      "password": account.proxy_info.password
     }
+    time.sleep(5)
+
     cl = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,

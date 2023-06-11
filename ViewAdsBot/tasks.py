@@ -17,10 +17,28 @@ from asgiref.sync import async_to_sync
 def get_orders(self):
     return "ok"
 
+async def do_action_task(accounts):
+    from ClientApiInterface import do_action
+
+    for account in accounts:
+        results = await do_action(account_data=account)
+        for result in results:
+            print("Setting result...")
+            order = Order.objects.filter(id=result["order_id"]).first()
+            if order:
+                if result["result"]:
+                    order.success_count += 1
+                else:
+                    order.faild_count += 1
+                order.save()
+
+        print("Sleeping for 20 sec...")
+        time.sleep(20)
+
 
 @celery_app.task(bind=True)
 def run_orders(self):
-    from ClientApiInterface import do_action
+
     orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING, accept_to_start=True,
                                   start_at__lte=timezone.now())
     if orders.count() > 0:
@@ -65,25 +83,11 @@ def run_orders(self):
 
         else:
             pass
-        for account in accounts:
-            loop = asyncio.get_event_loop()
-            results = loop.run_until_complete(do_action(account_data=account))
-            for result in results:
-                print("Setting result...")
-                order = Order.objects.filter(id=result["order_id"]).first()
-                if order:
-                    if result["result"]:
-                        order.success_count += 1
-                    else:
-                        order.faild_count += 1
-                    order.save()
 
-            print("Sleeping for 20 sec...")
-            time.sleep(20)
-
-        for o in (join_orders + view_orders):
-            o.status = Order.OrderStatusChoices.FINISHED
-            o.save()
+        do_action_task(accounts)
+        # for o in (join_orders + view_orders):
+        #     o.status = Order.OrderStatusChoices.FINISHED
+        #     o.save()
 
 
 @celery_app.task(bind=True)

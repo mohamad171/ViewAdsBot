@@ -10,6 +10,8 @@ import os
 from website.models import *
 from django.utils import timezone
 import asyncio
+from asgiref.sync import async_to_sync
+
 
 @celery_app.task(bind=True)
 def get_orders(self):
@@ -62,7 +64,7 @@ async def run_orders(self):
         else:
             pass
         for account in accounts:
-            results = await do_action(account_data=account)
+            results = async_to_sync(do_action(account_data=account))
 
             for result in results:
                 order = Order.objects.filter(id=result["order_id"]).first()

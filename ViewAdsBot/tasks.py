@@ -88,4 +88,5 @@ def check_accounts(self):
     accounts = Account.objects.filter(is_active=True,is_logged_in=True)
     for account in accounts:
         loop = asyncio.get_event_loop()
+        loop.run_until_complete(check_is_ban(account))
 

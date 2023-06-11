@@ -8,7 +8,7 @@ from django.core.files.temp import NamedTemporaryFile
 import os
 from website.models import *
 from django.utils import timezone
-from ClientApiInterface import do_action
+# from ClientApiInterface import do_action
 
 @celery_app.task(bind=True)
 def get_orders(self):

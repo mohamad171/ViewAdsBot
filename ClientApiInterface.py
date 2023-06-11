@@ -1,7 +1,8 @@
 
 from pyrogram import Client
 from pyrogram.raw.functions import auth,account as rawaccount,messages
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired , AuthKeyUnregistered,UserDeactivatedBan
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired \
+    , AuthKeyUnregistered,UserDeactivatedBan,SessionRevoked
 from BackendInterface import BackendInterface
 import time
 # api_id = 26261816
@@ -208,30 +209,29 @@ def do_action(account_data):
     action_results = []
     for action in account_data["actions"]:
         action_result = {}
-        if action["order_type"] == 1:
-            # Should join
-            
-            try:
+        try:
+            if action["order_type"] == 1:
                 client.join_chat(action["link"])
-                action_result["order_id"] = action["order_id"]
-                action_result["result"] = True
-            except Exception as ex:
-                print(ex)
-                action_result["order_id"] = action["order_id"]
-                action_result["result"] = False
-        else:
-            # Should View
-            try:
+            else:
                 client.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))
-                action_result["order_id"] = action["order_id"]
-                action_result["result"] = True
-            except Exception as ex:
-                print(ex)
-                action_result["order_id"] = action["order_id"]
-                action_result["result"] = False
+
+            action_result["order_id"] = action["order_id"]
+            action_result["result"] = True
+        except Exception as ex:
+            print(ex)
+            action_result["order_id"] = action["order_id"]
+            action_result["result"] = False
+        except SessionRevoked:
+            action_result["order_id"] = action["order_id"]
+            action_result["result"] = False
+
+            account.is_logged_in = False
+            account.is_active = False
+            account.save()
+
 
         
         action_results.append(action_result)

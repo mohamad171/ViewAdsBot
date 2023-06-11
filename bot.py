@@ -2,6 +2,7 @@ import json
 import atexit
 import os.path
 import pickle
+from concurrent.futures import ThreadPoolExecutor
 
 from telegram import ForceReply, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, \
@@ -84,6 +85,11 @@ def callback(value):
 
 def do_action_task(accounts):
     from ClientApiInterface import do_action
+    for account in accounts:
+        executor = ThreadPoolExecutor(1)
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(executor,do_action, account)
+
     # loop = asyncio.get_event_loop()
     # tasks = []
     # for account in accounts:
@@ -91,8 +97,8 @@ def do_action_task(accounts):
     #
     # loop.run_until_complete(asyncio.wait(tasks))
     # loop.close()
-    pool = ThreadPool(processes=10)
-    pool.map_async(do_action,accounts)
+    # pool = ThreadPool(processes=10)
+    # pool.map_async(do_action,accounts)
 
 
 

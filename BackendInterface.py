@@ -134,10 +134,11 @@ class BackendInterface:
     def get_orders(self):
         orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING, accept_to_start=True,
                                       start_at__lte=timezone.now())
+        accounts = []
         if orders.count() > 0:
             join_orders = orders.filter(order_type=Order.OrderTypeChoices.JOIN).order_by("-count")
             view_orders = orders.filter(order_type=Order.OrderTypeChoices.VIEW).order_by("-count")
-            accounts = []
+
             biggest_order = 0
             if join_orders.count() > 0:
                 biggest_order = join_orders.first().count

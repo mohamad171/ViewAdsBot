@@ -235,6 +235,10 @@ async def do_action(account_data):
             print(ex)
             action_result["order_id"] = action["order_id"]
             action_result["result"] = False
+            account.is_logged_in = False
+            account.is_active = False
+            account.is_ban = True
+            account.save()
 
 
 

@@ -202,6 +202,7 @@ def do_action(account_data):
      "username": account.proxy_info.username,
      "password": account.proxy_info.password
     }
+    client = None
 
     client = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",

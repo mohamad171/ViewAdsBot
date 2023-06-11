@@ -176,7 +176,7 @@ async def change_bio_details(phone, bio_text, profile_image):
      "username": account.proxy_info.username,
      "password": account.proxy_info.password
     }
-    print(phone.replace("+",""))
+
     client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
@@ -203,7 +203,7 @@ def do_action(account_data):
      "password": account.proxy_info.password
     }
     client = None
-
+    print(account.phone.replace("+",""))
     client = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,

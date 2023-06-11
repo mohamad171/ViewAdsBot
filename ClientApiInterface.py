@@ -240,8 +240,7 @@ async def do_action(account_data):
         action_results.append(action_result)
 
     
-    await client.disconnect()
-    if client.is_connected:
-        await client.stop()
+    await client.stop()
+
     time.sleep(2)
     return action_results

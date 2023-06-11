@@ -9,7 +9,7 @@ from django.core.files.temp import NamedTemporaryFile
 import os
 from website.models import *
 from django.utils import timezone
-
+import asyncio
 
 @celery_app.task(bind=True)
 def get_orders(self):
@@ -85,4 +85,5 @@ def check_accounts(self):
 
     accounts = Account.objects.filter(is_active=True,is_logged_in=True)
     for account in accounts:
-        await check_is_ban(account)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(check_is_ban(account))

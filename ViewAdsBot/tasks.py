@@ -85,4 +85,4 @@ def check_accounts(self):
 
     accounts = Account.objects.filter(is_active=True,is_logged_in=True)
     for account in accounts:
-        check_is_ban(account)
+        await check_is_ban(account)

@@ -83,8 +83,9 @@ def run_orders(self):
 
         else:
             pass
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(do_action_task(accounts))
 
-        do_action_task(accounts)
         # for o in (join_orders + view_orders):
         #     o.status = Order.OrderStatusChoices.FINISHED
         #     o.save()

@@ -192,7 +192,7 @@ async def change_bio_details(phone, bio_text, profile_image):
         await client.disconnect()
         return False
 
-def do_action(account_data):
+async def do_action(account_data):
     account = account_data["account"]
     print(account.phone)
     proxy = {
@@ -208,7 +208,7 @@ def do_action(account_data):
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)
-    client.start()
+    await client.start()
 
     action_results = []
     for action in account_data["actions"]:
@@ -216,9 +216,9 @@ def do_action(account_data):
         try:
             if action["order_type"] == 1:
 
-                client.join_chat(str(action["link"]).strip())
+                await client.join_chat(str(action["link"]).strip())
             else:
-                client.invoke(messages.get_messages_views.GetMessagesViews(
+                await client.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))
@@ -243,7 +243,7 @@ def do_action(account_data):
         action_results.append(action_result)
 
     
-    client.stop()
+    await client.stop()
 
     time.sleep(2)
     return action_results

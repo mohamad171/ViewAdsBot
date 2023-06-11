@@ -83,10 +83,15 @@ def callback(value):
 
 def do_action_task(accounts):
     from ClientApiInterface import do_action
-
+    loop = asyncio.get_event_loop()
+    tasks = []
     for account in accounts:
+        loop.create_task(do_action(account_data=account))
 
-        results = asyncio.create_task(do_action(account_data=account))
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+
+
 
         # for result in results:
         #     print("Setting result...")
@@ -98,8 +103,7 @@ def do_action_task(accounts):
         #             order.faild_count += 1
         #         order.save()
 
-        print("Sleeping for 20 sec...")
-        time.sleep(20)
+
 
 async def send_orders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 

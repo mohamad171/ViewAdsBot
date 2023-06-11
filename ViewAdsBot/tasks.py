@@ -1,4 +1,5 @@
 import datetime
+import json
 import random
 from unicodedata import name
 from .celery import app as celery_app
@@ -59,7 +60,7 @@ def run_orders(self):
 
         else:
             pass
-        return accounts
+        return json.dumps(accounts)
     # for account in accounts:
     #     print(account)
     #     results = do_action(account_data=account)

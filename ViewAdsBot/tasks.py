@@ -83,4 +83,4 @@ def run_orders(self):
 def check_accounts(self):
     accounts = Account.objects.filter(is_active=True,is_logged_in=True)
     for account in accounts:
-        await check_is_ban(account)
+        check_is_ban(account)

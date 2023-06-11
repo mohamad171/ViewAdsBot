@@ -141,7 +141,7 @@ async def change_bio_details(phone, bio_text, profile_image):
         await client.disconnect()
         return False
 
-async def do_action(account_data):
+def do_action(account_data):
     account = account_data["account"]
     proxy = {
      "scheme": "socks5",  # "socks4", "socks5" and "http" are supported

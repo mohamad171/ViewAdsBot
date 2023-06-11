@@ -81,7 +81,7 @@ async def do_action_task(accounts):
     from ClientApiInterface import do_action
 
     for account in accounts:
-        results = asyncio.run(do_action(account_data=account))
+        results = asyncio.create_task(do_action(account_data=account))
         # for result in results:
         #     print("Setting result...")
         #     order = Order.objects.filter(id=result["order_id"]).first()

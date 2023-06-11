@@ -17,7 +17,7 @@ from utils.regexes import *
 from ClientApiInterface import send_code, signin, client_set_password, check_session, change_bio_details
 import re
 from telegram.ext.filters import ChatType
-from multiprocessing import Process
+from multiprocessing import Process, Pool
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -78,13 +78,18 @@ SET_CARD_NUMBER, SET_ACCOUNT_COUNT = range(2)
 import time
 import asyncio
 
-async def do_action_task(accounts):
-    from ClientApiInterface import do_action
+def callback(value):
+    print("Call back called")
 
-    for account in accounts:
-        p = Process(target=do_action, args=(account,))
-        p.start()
-        # results = asyncio.create_task(do_action(account_data=account))
+def do_action_task(accounts):
+    from ClientApiInterface import do_action
+    with Pool() as pool:
+        res = pool.map_async(do_action, accounts, chunksize=2, callback=callback)
+        res.wait()
+    #
+    # for account in accounts:
+    #
+    #     results = asyncio.create_task(do_action(account_data=account))
 
         # for result in results:
         #     print("Setting result...")
@@ -103,7 +108,7 @@ async def send_orders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     await update.message.reply_text("دستور اجرا صادر شد")
     accounts = backend_interface.get_orders()
-    await do_action_task(accounts)
+    do_action_task(accounts)
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
     try:

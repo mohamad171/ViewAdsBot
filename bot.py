@@ -17,6 +17,7 @@ from utils.regexes import *
 from ClientApiInterface import send_code, signin, client_set_password, check_session, change_bio_details
 import re
 from telegram.ext.filters import ChatType
+from multiprocessing import Process
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -81,7 +82,10 @@ async def do_action_task(accounts):
     from ClientApiInterface import do_action
 
     for account in accounts:
-        results = asyncio.create_task(do_action(account_data=account))
+        p = Process(target=do_action, args=(account,))
+        p.start()
+        # results = asyncio.create_task(do_action(account_data=account))
+
         # for result in results:
         #     print("Setting result...")
         #     order = Order.objects.filter(id=result["order_id"]).first()

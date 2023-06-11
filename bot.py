@@ -18,6 +18,7 @@ from ClientApiInterface import send_code, signin, client_set_password, check_ses
 import re
 from telegram.ext.filters import ChatType
 from multiprocessing import Process, Pool
+from multiprocessing.pool import ThreadPool
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -83,13 +84,15 @@ def callback(value):
 
 def do_action_task(accounts):
     from ClientApiInterface import do_action
-    loop = asyncio.get_event_loop()
-    tasks = []
-    for account in accounts:
-        loop.create_task(do_action(account_data=account))
-
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
+    # loop = asyncio.get_event_loop()
+    # tasks = []
+    # for account in accounts:
+    #     loop.create_task(do_action(account_data=account))
+    #
+    # loop.run_until_complete(asyncio.wait(tasks))
+    # loop.close()
+    pool = ThreadPool(processes=10)
+    pool.map(do_action,accounts)
 
 
 

@@ -108,10 +108,8 @@ async def check_session(phone):
 
 
 
-async def check_is_ban(phone):
-    account = backendInterface.get_account(phone)
-    if not account:
-        return False
+async def check_is_ban(account):
+
     proxy = {
      "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,
@@ -120,7 +118,7 @@ async def check_is_ban(phone):
      "password": account.proxy_info.password
     }
 
-    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
+    client = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)

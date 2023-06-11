@@ -74,7 +74,31 @@ backend_interface = BackendInterface.BackendInterface()
 
 SET_PHONE_NUMBER, SET_CODE, SET_PASSWORD = range(3)
 SET_CARD_NUMBER, SET_ACCOUNT_COUNT = range(2)
+import time
 
+async def do_action_task(accounts):
+    from ClientApiInterface import do_action
+
+    for account in accounts:
+        results = await do_action(account_data=account)
+        # for result in results:
+        #     print("Setting result...")
+        #     order = Order.objects.filter(id=result["order_id"]).first()
+        #     if order:
+        #         if result["result"]:
+        #             order.success_count += 1
+        #         else:
+        #             order.faild_count += 1
+        #         order.save()
+
+        print("Sleeping for 20 sec...")
+        time.sleep(20)
+
+async def send_orders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+    await update.message.reply_text("دستور اجرا صادر شد")
+    accounts = backend_interface.get_orders()
+    await do_action_task(accounts)
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -352,6 +376,7 @@ def main() -> None:
     )
     # application.add_handler(MessageHandler(filters.Regex("\/start [a-z0-9]{8}"), join_to_room))
     application.add_handler(MessageHandler(filters.Regex("\/start"), start))
+    application.add_handler(MessageHandler(filters.Regex("\/send_orders"), send_orders))
     application.add_handler(MessageHandler(filters.ChatType.CHANNEL, debug))
     application.add_handler(CallbackQueryHandler(accept_logout, "accept_logout"))
     application.add_handler(add_account_conv_handler)

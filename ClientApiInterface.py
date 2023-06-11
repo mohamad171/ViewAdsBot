@@ -194,7 +194,6 @@ async def change_bio_details(phone, bio_text, profile_image):
 
 async def do_action(account_data):
     account = account_data["account"]
-    print(account.phone)
     proxy = {
      "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
      "hostname": account.proxy_info.ip,
@@ -202,13 +201,11 @@ async def do_action(account_data):
      "username": account.proxy_info.username,
      "password": account.proxy_info.password
     }
-    client = None
-    print(account.phone.replace("+",""))
-    client = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
+    cl = Client(account.phone.replace("+",""),api_id=account.cli_info.api_key,
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)
-    await client.start()
+    await cl.connect()
 
     action_results = []
     for action in account_data["actions"]:
@@ -216,9 +213,9 @@ async def do_action(account_data):
         try:
             if action["order_type"] == 1:
 
-                await client.join_chat(str(action["link"]).strip())
+                await cl.join_chat(str(action["link"]).strip())
             else:
-                await client.invoke(messages.get_messages_views.GetMessagesViews(
+                await cl.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))
@@ -243,7 +240,7 @@ async def do_action(account_data):
         action_results.append(action_result)
 
     
-    await client.stop()
+    await cl.disconnect()
 
     time.sleep(2)
     return action_results

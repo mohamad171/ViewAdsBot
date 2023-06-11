@@ -214,6 +214,7 @@ def do_action(account_data):
         action_result = {}
         try:
             if action["order_type"] == 1:
+                print(str(action["link"]))
                 client.join_chat(str(action["link"]).strip())
             else:
                 client.invoke(messages.get_messages_views.GetMessagesViews(

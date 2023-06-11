@@ -1,5 +1,4 @@
-from pyrogram import Client, filters
-import asyncio
+
 from pyrogram import Client
 from pyrogram.raw.functions import auth,account as rawaccount,messages
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid,PhoneCodeExpired , AuthKeyUnregistered,UserDeactivatedBan

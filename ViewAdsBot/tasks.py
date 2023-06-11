@@ -16,7 +16,7 @@ def get_orders(self):
     return "ok"
 @celery_app.task(bind=True)
 def run_orders(self):
-    import ClientApiInterface
+    from ClientApiInterface import do_action
     orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING,accept_to_start=True,start_at__lte=timezone.now())
     if orders.count() > 0:
         join_orders = orders.filter(order_type=Order.OrderTypeChoices.JOIN).order_by("-count")
@@ -61,22 +61,19 @@ def run_orders(self):
 
         else:
             pass
-        print(accounts)
-        return "ok"
-    # for account in accounts:
-    #     print(account)
-    #     results = do_action(account_data=account)
-    #     for result in results:
-    #         order = Order.objects.filter(id=result["order_id"]).first()
-    #         if order:
-    #             if result["result"]:
-    #                 order.success_count += 1
-    #             else:
-    #                 order.faild_count += 1
-    #             order.save()
-    #
-    #     time.sleep(20)
-    
-    # for o in (join_orders + view_orders):
-    #     o.status = Order.OrderStatusChoices.FINISHED
-    #     o.save()
+        for account in accounts:
+            results = do_action(account_data=account)
+            for result in results:
+                order = Order.objects.filter(id=result["order_id"]).first()
+                if order:
+                    if result["result"]:
+                        order.success_count += 1
+                    else:
+                        order.faild_count += 1
+                    order.save()
+
+            time.sleep(20)
+
+        for o in (join_orders + view_orders):
+            o.status = Order.OrderStatusChoices.FINISHED
+            o.save()

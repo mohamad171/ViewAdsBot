@@ -77,7 +77,9 @@ def run_orders(self):
                         else:
                             order.faild_count += 1
                         order.save()
-            except:
+            except Exception as ex:
+                print(account)
+                print(ex)
                 pass
 
             time.sleep(20)

@@ -192,7 +192,7 @@ async def change_bio_details(phone, bio_text, profile_image):
         await client.disconnect()
         return False
 
-async def do_action(account_data):
+def do_action(account_data):
     account = account_data["account"]
     print(account.phone)
     proxy = {
@@ -207,26 +207,22 @@ async def do_action(account_data):
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)
-    await client.connect()
+    client.connect()
 
     action_results = []
     for action in account_data["actions"]:
         action_result = {}
         try:
             if action["order_type"] == 1:
-                await client.join_chat(str(action["link"]).strip())
+                client.join_chat(str(action["link"]).strip())
             else:
-                await client.invoke(messages.get_messages_views.GetMessagesViews(
+                client.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))
 
             action_result["order_id"] = action["order_id"]
             action_result["result"] = True
-        except Exception as ex:
-            print(ex)
-            action_result["order_id"] = action["order_id"]
-            action_result["result"] = False
         except SessionRevoked:
             action_result["order_id"] = action["order_id"]
             action_result["result"] = False
@@ -234,13 +230,18 @@ async def do_action(account_data):
             account.is_logged_in = False
             account.is_active = False
             account.save()
+        except Exception as ex:
+            print(ex)
+            action_result["order_id"] = action["order_id"]
+            action_result["result"] = False
+
 
 
         
         action_results.append(action_result)
 
     
-    await client.disconnect()
+    client.disconnect()
 
     time.sleep(2)
     return action_results

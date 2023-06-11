@@ -83,12 +83,12 @@ import asyncio
 def callback(value):
     print("Call back called")
 
-def do_action_task(accounts):
+async def do_action_task(accounts):
     from ClientApiInterface import do_action
     for account in accounts:
         executor = ThreadPoolExecutor(1)
         loop = asyncio.get_event_loop()
-        loop.run_in_executor(executor,do_action, account)
+        await loop.run_in_executor(executor,do_action, account)
 
     # loop = asyncio.get_event_loop()
     # tasks = []
@@ -118,7 +118,7 @@ async def send_orders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     await update.message.reply_text("دستور اجرا صادر شد")
     accounts = backend_interface.get_orders()
-    do_action_task(accounts)
+    await do_action_task(accounts)
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
     try:

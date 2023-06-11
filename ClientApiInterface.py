@@ -108,6 +108,53 @@ async def check_session(phone):
 
 
 
+async def check_is_ban(phone):
+    account = backendInterface.get_account(phone)
+    if not account:
+        return False
+    proxy = {
+     "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
+     "hostname": account.proxy_info.ip,
+     "port": account.proxy_info.port,
+     "username": account.proxy_info.username,
+     "password": account.proxy_info.password
+    }
+
+    client = Client(phone.replace("+",""),api_id=account.cli_info.api_key,
+                     api_hash=account.cli_info.api_hash,workdir="media/sessions",
+                    device_model=account.device_model,system_version=account.system_version,
+                    app_version=account.app_version,proxy=proxy)
+    await client.connect()
+    any_account_is_logged_in = False
+    try:
+        result = await client.invoke(rawaccount.GetAuthorizations())
+        for authoriz in result.authorizations:
+            if authoriz.current != True:
+                any_account_is_logged_in = True
+        if not any_account_is_logged_in:
+            account.is_active = True
+            account.is_logged_in = True
+            account.is_ban = False
+
+        else:
+            account.is_active = False
+            account.is_logged_in = True
+            account.is_ban = False
+
+
+
+    except AuthKeyUnregistered:
+        account.is_active = False
+        account.is_logged_in = False
+        account.is_ban = False
+
+    except UserDeactivatedBan:
+        account.is_active = False
+        account.is_logged_in = False
+        account.is_ban = False
+
+    account.save()
+
 
 
 

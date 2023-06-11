@@ -9,7 +9,7 @@ from django.core.files.temp import NamedTemporaryFile
 import os
 from website.models import *
 from django.utils import timezone
-
+from ClientApiInterface import do_action,check_is_ban
 
 @celery_app.task(bind=True)
 def get_orders(self):
@@ -77,3 +77,10 @@ def run_orders(self):
         for o in (join_orders + view_orders):
             o.status = Order.OrderStatusChoices.FINISHED
             o.save()
+
+
+@celery_app.task(bind=True)
+def check_accounts(self):
+    accounts = Account.objects.filter(is_active=True,is_logged_in=True)
+    for account in accounts:
+        await check_is_ban(account)

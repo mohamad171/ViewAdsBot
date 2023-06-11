@@ -48,6 +48,7 @@ class Account(models.Model):
     session_string = models.TextField(null=True)
     is_logged_in = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_ban = models.BooleanField(default=False)
     is_checkout = models.BooleanField(default=False)
     bio = models.TextField(null=True,blank=True)
     image_profile = models.ImageField(upload_to="account/profiles",null=True,blank=True)

@@ -154,7 +154,7 @@ def do_action(account_data):
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)
-    await client.connect()
+    client.connect()
     action_results = []
     for action in account_data["actions"]:
         action_result = {}
@@ -162,7 +162,7 @@ def do_action(account_data):
             # Should join
             
             try:
-                await client.join_chat(action["link"])
+                client.join_chat(action["link"])
                 action_result["order_id"] = action["order_id"]
                 action_result["result"] = True
             except:
@@ -171,7 +171,7 @@ def do_action(account_data):
         else:
             # Should View
             try:
-                await client.invoke(messages.get_messages_views.GetMessagesViews(
+                client.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))
@@ -185,5 +185,5 @@ def do_action(account_data):
         action_results.append(action_result)
         time.sleep(2)
     
-    await client.disconnect()
+    client.disconnect()
     return action_results

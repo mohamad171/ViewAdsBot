@@ -10,7 +10,7 @@ class StartedUsersAdmin(admin.ModelAdmin):
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ["id","user","phone","cli_info","proxy_info","is_logged_in","is_active"]
+    list_display = ["id","user","phone","cli_info","proxy_info","is_logged_in","is_active","is_ban"]
 
 
 @admin.register(SampleBio)

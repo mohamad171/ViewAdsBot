@@ -58,18 +58,18 @@ def run_orders(self):
     else:
         pass
 
-    for account in accounts:
-        results = do_action(account_data=account)
-        for result in results:
-            order = Order.objects.filter(id=result["order_id"]).first()
-            if order:
-                if result["result"]:
-                    order.success_count += 1
-                else:
-                    order.faild_count += 1
-                order.save()
-
-        time.sleep(20)
+    # for account in accounts:
+    #     results = do_action(account_data=account)
+    #     for result in results:
+    #         order = Order.objects.filter(id=result["order_id"]).first()
+    #         if order:
+    #             if result["result"]:
+    #                 order.success_count += 1
+    #             else:
+    #                 order.faild_count += 1
+    #             order.save()
+    #
+    #     time.sleep(20)
     
     for o in (join_orders + view_orders):
         o.status = Order.OrderStatusChoices.FINISHED

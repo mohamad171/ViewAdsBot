@@ -30,7 +30,7 @@ def run_orders(self):
                 biggest_order = view_orders.first()
 
 
-        all_accounts = Account.objects.filter(is_active=True,is_logged_in=True).order_by("last_used")
+        all_accounts = Account.objects.filter(is_active=True,is_logged_in=True,is_ban=False).order_by("last_used")
         if all_accounts.count() >= biggest_order:
 
             for a in all_accounts:

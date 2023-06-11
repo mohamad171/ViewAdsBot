@@ -95,15 +95,19 @@ async def check_session(phone):
             if authoriz.current != True:
                 any_account_is_logged_in = True
         if not any_account_is_logged_in:
+            await client.disconnect()
             return True,False
         else:
+            await client.disconnect()
             return False,False
 
 
     except AuthKeyUnregistered:
         pass
     except UserDeactivatedBan:
+        await client.disconnect()
         return False,True
+    await client.disconnect()
     return False,False
 
 
@@ -152,6 +156,8 @@ async def check_is_ban(account):
         account.is_ban = False
 
     account.save()
+
+    await client.disconnect()
 
 
 

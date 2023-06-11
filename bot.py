@@ -84,13 +84,9 @@ def callback(value):
 def do_action_task(accounts):
     from ClientApiInterface import do_action
 
-    #
     for account in accounts:
-        with Pool() as pool:
-            res = pool.apply_async(do_action, account, callback=callback)
-            # res.wait()
-    #
-    #     results = asyncio.create_task(do_action(account_data=account))
+
+        results = asyncio.create_task(do_action(account_data=account))
 
         # for result in results:
         #     print("Setting result...")

@@ -215,9 +215,8 @@ def do_action(account_data):
         action_result = {}
         try:
             if action["order_type"] == 1:
-                print(client.get_chat(str(action["link"]).strip()))
 
-                client.join_chat(client.get_chat(str(action["link"]).strip()).linked_chat.id)
+                client.join_chat(str(action["link"]).strip())
             else:
                 client.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],

@@ -88,7 +88,7 @@ def do_action_task(accounts):
     for account in accounts:
         executor = ThreadPoolExecutor(1)
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(executor,do_action, account)
+        loop.run_in_executor(executor,do_action, account)
 
     # loop = asyncio.get_event_loop()
     # tasks = []

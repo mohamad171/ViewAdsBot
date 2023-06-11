@@ -16,7 +16,7 @@ def get_orders(self):
     return "ok"
 @celery_app.task(bind=True)
 def run_orders(self):
-    from ClientApiInterface import do_action
+    import ClientApiInterface
     orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING,accept_to_start=True,start_at__lte=timezone.now())
     if orders.count() > 0:
         join_orders = orders.filter(order_type=Order.OrderTypeChoices.JOIN).order_by("-count")

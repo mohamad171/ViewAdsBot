@@ -16,6 +16,11 @@ from asgiref.sync import async_to_sync
 @celery_app.task(bind=True)
 def get_orders(self):
     return "ok"
+
+
+
+
+
 @celery_app.task(bind=True)
 def run_orders(self):
     from ClientApiInterface import do_action
@@ -64,7 +69,7 @@ def run_orders(self):
         else:
             pass
         for account in accounts:
-            results = async_to_sync(do_action(account_data=account))
+            results = asyncio.run(do_action(account_data=account))
 
             for result in results:
                 order = Order.objects.filter(id=result["order_id"]).first()

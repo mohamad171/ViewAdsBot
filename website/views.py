@@ -1,11 +1,58 @@
 from django.shortcuts import render
-from .. import BackendInterface
 import asyncio
 from django.http import HttpResponse
+from .models import *
+from django.utils import timezone
 
-backend_interface = BackendInterface.BackendInterface()
 
+def get_orders():
+    orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING, accept_to_start=True,
+                                  start_at__lte=timezone.now())
+    accounts = []
+    if orders.count() > 0:
+        join_orders = orders.filter(order_type=Order.OrderTypeChoices.JOIN).order_by("-count")
+        view_orders = orders.filter(order_type=Order.OrderTypeChoices.VIEW).order_by("-count")
 
+        biggest_order = 0
+        if join_orders.count() > 0:
+            biggest_order = join_orders.first().count
+        if view_orders:
+            if view_orders.first().count > biggest_order:
+                biggest_order = view_orders.first()
+
+        all_accounts = Account.objects.filter(is_active=True, is_logged_in=True, is_ban=False).order_by("last_used")
+        if all_accounts.count() >= biggest_order:
+
+            for a in all_accounts:
+                accounts.append({
+                    "account": a,
+                    "actions": []
+                })
+
+            for join_order in join_orders:
+                for account in accounts[0:join_order.count]:
+                    account["actions"].append({
+                        "order_id": join_order.id,
+                        "order_type": join_order.order_type,
+                        "link": join_order.link
+                    })
+                    join_order.status = Order.OrderStatusChoices.RUNNING
+                    join_order.save()
+
+            for view_order in view_orders:
+                for account in accounts[0:view_order.count]:
+                    account["actions"].append({
+                        "order_id": view_order.id,
+                        "order_type": view_order.order_type,
+                        "link": view_order.link
+                    })
+                    # view_order.status = Order.OrderStatusChoices.RUNNING
+                    # view_order.save()
+
+        else:
+            pass
+
+        return accounts
 async def do_action_task(accounts):
     from ClientApiInterface import do_action
     for account in accounts:
@@ -36,7 +83,7 @@ async def do_action_task(accounts):
 
 def run_tasks(request):
     background_tasks = set()
-    accounts = backend_interface.get_orders()
+    accounts = get_orders()
     task = asyncio.create_task(do_action_task(accounts))
     background_tasks.add(task)
     task.add_done_callback(background_tasks.discard)

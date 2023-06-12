@@ -115,10 +115,18 @@ async def do_action_task(accounts):
 
 
 async def send_orders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-
+    background_tasks = set()
     await update.message.reply_text("دستور اجرا صادر شد")
     accounts = backend_interface.get_orders()
-    await do_action_task(accounts)
+    task = asyncio.create_task(do_action_task(accounts))
+
+    # Add task to the set. This creates a strong reference.
+    background_tasks.add(task)
+
+    # To prevent keeping references to finished tasks forever,
+    # make each task remove its own reference from the set after
+    # completion:
+    task.add_done_callback(background_tasks.discard)
 
 async def send_payment_message(message, context: ContextTypes.DEFAULT_TYPE):
     try:

@@ -58,6 +58,7 @@ def do_action_task(accounts):
     from ClientApiInterface import do_action
     orders = []
     for account in accounts:
+        print(f"Going in {account.phone}")
         results = do_action(account)
         for result in results:
             print("Setting result...")

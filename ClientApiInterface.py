@@ -232,6 +232,7 @@ def do_action(account_data):
             account.is_logged_in = False
             account.is_active = False
             account.save()
+            print(f"{account.phone} Session revoked")
         except UserDeactivatedBan:
             action_result["order_id"] = action["order_id"]
             action_result["result"] = False
@@ -239,6 +240,7 @@ def do_action(account_data):
             account.is_active = False
             account.is_ban = True
             account.save()
+            print(f"{account.phone} User Deactivated")
         except Exception as ex:
             print(ex)
             action_result["order_id"] = action["order_id"]

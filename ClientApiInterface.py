@@ -192,7 +192,7 @@ async def change_bio_details(phone, bio_text, profile_image):
         await client.disconnect()
         return False
 
-async def do_action(account_data):
+def do_action(account_data):
     account = account_data["account"]
     proxy = {
      "scheme": "socks5",  # "socks4", "socks5" and "http" are supported
@@ -208,7 +208,7 @@ async def do_action(account_data):
                      api_hash=account.cli_info.api_hash,workdir="media/sessions",
                     device_model=account.device_model,system_version=account.system_version,
                     app_version=account.app_version,proxy=proxy)
-    await cl.connect()
+    cl.connect()
 
     action_results = []
     for action in account_data["actions"]:
@@ -216,9 +216,9 @@ async def do_action(account_data):
         try:
             if action["order_type"] == 1:
 
-                await cl.join_chat(str(action["link"]).strip())
+                cl.join_chat(str(action["link"]).strip())
             else:
-                await cl.invoke(messages.get_messages_views.GetMessagesViews(
+                cl.invoke(messages.get_messages_views.GetMessagesViews(
                     id=action["link"],
                     increment=True
                 ))
@@ -250,7 +250,7 @@ async def do_action(account_data):
         action_results.append(action_result)
 
     
-    await cl.disconnect()
+    cl.disconnect()
 
     time.sleep(2)
     return action_results

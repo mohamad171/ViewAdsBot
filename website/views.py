@@ -53,10 +53,11 @@ def get_orders():
             pass
 
         return accounts
-async def do_action_task(accounts):
+
+def do_action_task(accounts):
     from ClientApiInterface import do_action
     for account in accounts:
-        await do_action(account)
+        do_action(account)
 
     # loop = asyncio.get_event_loop()
     # tasks = []

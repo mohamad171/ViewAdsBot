@@ -3,7 +3,7 @@ import asyncio
 from django.http import HttpResponse
 from .models import *
 from django.utils import timezone
-
+from multiprocessing import Process
 
 def get_orders():
     orders = Order.objects.filter(status=Order.OrderStatusChoices.WATING, accept_to_start=True,
@@ -84,8 +84,11 @@ async def do_action_task(accounts):
 def run_tasks(request):
     background_tasks = set()
     accounts = get_orders()
-    task = asyncio.create_task(do_action_task(accounts))
-    background_tasks.add(task)
-    task.add_done_callback(background_tasks.discard)
+    p = Process(target=do_action_task, args=(accounts,))
+    p.start()
+    #
+    # task = asyncio.create_task(do_action_task(accounts))
+    # background_tasks.add(task)
+    # task.add_done_callback(background_tasks.discard)
 
     return HttpResponse("Ok")

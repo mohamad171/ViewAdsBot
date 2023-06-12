@@ -56,8 +56,26 @@ def get_orders():
 
 def do_action_task(accounts):
     from ClientApiInterface import do_action
+    orders = []
     for account in accounts:
-        do_action(account)
+        results = do_action(account)
+        for result in results:
+            print("Setting result...")
+            order = Order.objects.filter(id=result["order_id"]).first()
+            if order:
+                if result["result"]:
+                    order.success_count += 1
+                else:
+                    order.faild_count += 1
+                order.save()
+
+                if order not in orders:
+                    orders.append(order)
+
+    for o in orders:
+        o.status = Order.OrderStatusChoices.FINISHED
+        o.save()
+
 
     # loop = asyncio.get_event_loop()
     # tasks = []

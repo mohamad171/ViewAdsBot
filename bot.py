@@ -86,9 +86,7 @@ def callback(value):
 async def do_action_task(accounts):
     from ClientApiInterface import do_action
     for account in accounts:
-        executor = ThreadPoolExecutor(1)
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(executor,do_action, account)
+        await do_action(account)
 
     # loop = asyncio.get_event_loop()
     # tasks = []

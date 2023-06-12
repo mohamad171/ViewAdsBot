@@ -13,6 +13,8 @@ def get_orders():
         join_orders = orders.filter(order_type=Order.OrderTypeChoices.JOIN).order_by("-count")
         view_orders = orders.filter(order_type=Order.OrderTypeChoices.VIEW).order_by("-count")
 
+        print(join_orders.count())
+
         biggest_order = 0
         if join_orders.count() > 0:
             biggest_order = join_orders.first().count
@@ -21,6 +23,7 @@ def get_orders():
                 biggest_order = view_orders.first()
 
         all_accounts = Account.objects.filter(is_active=True, is_logged_in=True, is_ban=False).order_by("last_used")
+        print(f"All abailable accounts: {all_accounts.count()}")
         if all_accounts.count() >= biggest_order:
 
             for a in all_accounts:

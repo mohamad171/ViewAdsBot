@@ -72,12 +72,13 @@ def do_action_task(accounts):
                     order.faild_count += 1
                 order.save()
 
-                if order not in orders:
-                    orders.append(order)
 
-    for o in orders:
-        o.status = Order.OrderStatusChoices.FINISHED
-        o.save()
+
+
+    for o in Order.objects.filter():
+        if (o.success_count + o.faild_count) == o.count:
+            o.status = Order.OrderStatusChoices.FINISHED
+            o.save()
 
 
     # loop = asyncio.get_event_loop()

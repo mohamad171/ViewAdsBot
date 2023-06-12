@@ -104,6 +104,7 @@ def do_action_task(accounts):
 def run_tasks(request):
     background_tasks = set()
     accounts = get_orders()
+    print(accounts)
     p = Process(target=do_action_task, args=(accounts,))
     p.start()
     #

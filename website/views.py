@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 import asyncio
 from django.http import HttpResponse
@@ -71,6 +73,7 @@ def do_action_task(accounts):
                 else:
                     order.faild_count += 1
                 order.save()
+        time.sleep(15)
 
 
 
